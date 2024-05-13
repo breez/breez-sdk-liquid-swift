@@ -7,7 +7,7 @@ Pod::Spec.new do |spec|
   spec.authors                = { "Breez" => "contact@breez.technology" }
   spec.documentation_url      = "https://sdk-doc.breez.technology"
   spec.source                 = { :git => 'https://github.com/breez/breez-sdk-liquid-swift.git', :tag => spec.version }
-  spec.ios.deployment_target  = "11.0"
+  spec.ios.deployment_target  = "13.0"
   spec.source_files           = [
     "Sources/BreezSDKLiquid/*.swift", 
     "Sources/BreezSDKLiquid/**/*.swift"

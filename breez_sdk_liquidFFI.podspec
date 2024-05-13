@@ -7,6 +7,6 @@ Pod::Spec.new do |spec|
   spec.authors                = { "Breez" => "contact@breez.technology" }
   spec.documentation_url      = "https://sdk-doc.breez.technology"
   spec.source                 = { :http => "https://github.com/breez/breez-sdk-liquid-swift/releases/download/#{spec.version}/breez_sdk_liquidFFI.xcframework.zip" }
-  spec.ios.deployment_target  = "11.0"
+  spec.ios.deployment_target  = "13.0"
   spec.vendored_frameworks    = "breez_sdk_liquidFFI.xcframework"
 end
