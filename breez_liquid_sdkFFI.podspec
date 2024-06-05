@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name                   = "breez_liquid_sdkFFI"
-  spec.version                = "0.0.1-dev9"
+  spec.version                = "0.0.1-dev10"
   spec.license                = { :type => "MIT" }
   spec.summary                = "Low-level bindings to the Breez Liquid SDK Rust API"
   spec.homepage               = "https://breez.technology"
