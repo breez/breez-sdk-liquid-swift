@@ -420,24 +420,16 @@ fileprivate struct FfiConverterUInt64: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterBool : FfiConverter {
-    typealias FfiType = Int8
-    typealias SwiftType = Bool
+fileprivate struct FfiConverterFloat: FfiConverterPrimitive {
+    typealias FfiType = Float
+    typealias SwiftType = Float
 
-    public static func lift(_ value: Int8) throws -> Bool {
-        return value != 0
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Float {
+        return try lift(readFloat(&buf))
     }
 
-    public static func lower(_ value: Bool) -> Int8 {
-        return value ? 1 : 0
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Bool {
-        return try lift(readInt(&buf))
-    }
-
-    public static func write(_ value: Bool, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
+    public static func write(_ value: Float, into buf: inout [UInt8]) {
+        writeFloat(&buf, lower(value))
     }
 }
 
@@ -490,7 +482,7 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func disconnect() throws 
     
-    func getInfo(req: GetInfoRequest) throws  -> GetInfoResponse
+    func getInfo() throws  -> GetInfoResponse
     
     func listPayments() throws  -> [Payment]
     
@@ -572,10 +564,9 @@ open func disconnect()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkEr
 }
 }
     
-open func getInfo(req: GetInfoRequest)throws  -> GetInfoResponse {
+open func getInfo()throws  -> GetInfoResponse {
     return try  FfiConverterTypeGetInfoResponse.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_get_info(self.uniffiClonePointer(),
-        FfiConverterTypeGetInfoRequest.lower(req),$0
+    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_get_info(self.uniffiClonePointer(),$0
     )
 })
 }
@@ -740,15 +731,19 @@ public struct Config {
     public var workingDir: String
     public var network: Network
     public var paymentTimeoutSec: UInt64
+    public var zeroConfMinFeeRate: Float
+    public var zeroConfMaxAmountSat: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(boltzUrl: String, electrumUrl: String, workingDir: String, network: Network, paymentTimeoutSec: UInt64) {
+    public init(boltzUrl: String, electrumUrl: String, workingDir: String, network: Network, paymentTimeoutSec: UInt64, zeroConfMinFeeRate: Float, zeroConfMaxAmountSat: UInt64?) {
         self.boltzUrl = boltzUrl
         self.electrumUrl = electrumUrl
         self.workingDir = workingDir
         self.network = network
         self.paymentTimeoutSec = paymentTimeoutSec
+        self.zeroConfMinFeeRate = zeroConfMinFeeRate
+        self.zeroConfMaxAmountSat = zeroConfMaxAmountSat
     }
 }
 
@@ -771,6 +766,12 @@ extension Config: Equatable, Hashable {
         if lhs.paymentTimeoutSec != rhs.paymentTimeoutSec {
             return false
         }
+        if lhs.zeroConfMinFeeRate != rhs.zeroConfMinFeeRate {
+            return false
+        }
+        if lhs.zeroConfMaxAmountSat != rhs.zeroConfMaxAmountSat {
+            return false
+        }
         return true
     }
 
@@ -780,6 +781,8 @@ extension Config: Equatable, Hashable {
         hasher.combine(workingDir)
         hasher.combine(network)
         hasher.combine(paymentTimeoutSec)
+        hasher.combine(zeroConfMinFeeRate)
+        hasher.combine(zeroConfMaxAmountSat)
     }
 }
 
@@ -792,7 +795,9 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
                 electrumUrl: FfiConverterString.read(from: &buf), 
                 workingDir: FfiConverterString.read(from: &buf), 
                 network: FfiConverterTypeNetwork.read(from: &buf), 
-                paymentTimeoutSec: FfiConverterUInt64.read(from: &buf)
+                paymentTimeoutSec: FfiConverterUInt64.read(from: &buf), 
+                zeroConfMinFeeRate: FfiConverterFloat.read(from: &buf), 
+                zeroConfMaxAmountSat: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
 
@@ -802,6 +807,8 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
         FfiConverterString.write(value.workingDir, into: &buf)
         FfiConverterTypeNetwork.write(value.network, into: &buf)
         FfiConverterUInt64.write(value.paymentTimeoutSec, into: &buf)
+        FfiConverterFloat.write(value.zeroConfMinFeeRate, into: &buf)
+        FfiConverterOptionUInt64.write(value.zeroConfMaxAmountSat, into: &buf)
     }
 }
 
@@ -869,55 +876,6 @@ public func FfiConverterTypeConnectRequest_lift(_ buf: RustBuffer) throws -> Con
 
 public func FfiConverterTypeConnectRequest_lower(_ value: ConnectRequest) -> RustBuffer {
     return FfiConverterTypeConnectRequest.lower(value)
-}
-
-
-public struct GetInfoRequest {
-    public var withScan: Bool
-
-    // Default memberwise initializers are never public by default, so we
-    // declare one manually.
-    public init(withScan: Bool) {
-        self.withScan = withScan
-    }
-}
-
-
-
-extension GetInfoRequest: Equatable, Hashable {
-    public static func ==(lhs: GetInfoRequest, rhs: GetInfoRequest) -> Bool {
-        if lhs.withScan != rhs.withScan {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(withScan)
-    }
-}
-
-
-public struct FfiConverterTypeGetInfoRequest: FfiConverterRustBuffer {
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> GetInfoRequest {
-        return
-            try GetInfoRequest(
-                withScan: FfiConverterBool.read(from: &buf)
-        )
-    }
-
-    public static func write(_ value: GetInfoRequest, into buf: inout [UInt8]) {
-        FfiConverterBool.write(value.withScan, into: &buf)
-    }
-}
-
-
-public func FfiConverterTypeGetInfoRequest_lift(_ buf: RustBuffer) throws -> GetInfoRequest {
-    return try FfiConverterTypeGetInfoRequest.lift(buf)
-}
-
-public func FfiConverterTypeGetInfoRequest_lower(_ value: GetInfoRequest) -> RustBuffer {
-    return FfiConverterTypeGetInfoRequest.lower(value)
 }
 
 
@@ -1189,11 +1147,11 @@ public func FfiConverterTypeLogEntry_lower(_ value: LogEntry) -> RustBuffer {
 
 
 public struct Payment {
-    public var txId: String
+    public var txId: String?
     public var swapId: String?
     public var timestamp: UInt32
     public var amountSat: UInt64
-    public var feesSat: UInt64?
+    public var feesSat: UInt64
     public var preimage: String?
     public var refundTxId: String?
     public var refundTxAmountSat: UInt64?
@@ -1202,7 +1160,7 @@ public struct Payment {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(txId: String, swapId: String? = nil, timestamp: UInt32, amountSat: UInt64, feesSat: UInt64? = nil, preimage: String? = nil, refundTxId: String? = nil, refundTxAmountSat: UInt64? = nil, paymentType: PaymentType, status: PaymentState) {
+    public init(txId: String? = nil, swapId: String? = nil, timestamp: UInt32, amountSat: UInt64, feesSat: UInt64, preimage: String? = nil, refundTxId: String? = nil, refundTxAmountSat: UInt64? = nil, paymentType: PaymentType, status: PaymentState) {
         self.txId = txId
         self.swapId = swapId
         self.timestamp = timestamp
@@ -1272,11 +1230,11 @@ public struct FfiConverterTypePayment: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Payment {
         return
             try Payment(
-                txId: FfiConverterString.read(from: &buf), 
+                txId: FfiConverterOptionString.read(from: &buf), 
                 swapId: FfiConverterOptionString.read(from: &buf), 
                 timestamp: FfiConverterUInt32.read(from: &buf), 
                 amountSat: FfiConverterUInt64.read(from: &buf), 
-                feesSat: FfiConverterOptionUInt64.read(from: &buf), 
+                feesSat: FfiConverterUInt64.read(from: &buf), 
                 preimage: FfiConverterOptionString.read(from: &buf), 
                 refundTxId: FfiConverterOptionString.read(from: &buf), 
                 refundTxAmountSat: FfiConverterOptionUInt64.read(from: &buf), 
@@ -1286,11 +1244,11 @@ public struct FfiConverterTypePayment: FfiConverterRustBuffer {
     }
 
     public static func write(_ value: Payment, into buf: inout [UInt8]) {
-        FfiConverterString.write(value.txId, into: &buf)
+        FfiConverterOptionString.write(value.txId, into: &buf)
         FfiConverterOptionString.write(value.swapId, into: &buf)
         FfiConverterUInt32.write(value.timestamp, into: &buf)
         FfiConverterUInt64.write(value.amountSat, into: &buf)
-        FfiConverterOptionUInt64.write(value.feesSat, into: &buf)
+        FfiConverterUInt64.write(value.feesSat, into: &buf)
         FfiConverterOptionString.write(value.preimage, into: &buf)
         FfiConverterOptionString.write(value.refundTxId, into: &buf)
         FfiConverterOptionUInt64.write(value.refundTxAmountSat, into: &buf)
@@ -1898,7 +1856,7 @@ public enum LiquidSdkEvent {
     )
     case paymentRefundPending(details: Payment
     )
-    case paymentSucceed(details: Payment
+    case paymentSucceeded(details: Payment
     )
     case paymentWaitingConfirmation(details: Payment
     )
@@ -1925,7 +1883,7 @@ public struct FfiConverterTypeLiquidSdkEvent: FfiConverterRustBuffer {
         case 4: return .paymentRefundPending(details: try FfiConverterTypePayment.read(from: &buf)
         )
         
-        case 5: return .paymentSucceed(details: try FfiConverterTypePayment.read(from: &buf)
+        case 5: return .paymentSucceeded(details: try FfiConverterTypePayment.read(from: &buf)
         )
         
         case 6: return .paymentWaitingConfirmation(details: try FfiConverterTypePayment.read(from: &buf)
@@ -1961,7 +1919,7 @@ public struct FfiConverterTypeLiquidSdkEvent: FfiConverterRustBuffer {
             FfiConverterTypePayment.write(details, into: &buf)
             
         
-        case let .paymentSucceed(details):
+        case let .paymentSucceeded(details):
             writeInt(&buf, Int32(5))
             FfiConverterTypePayment.write(details, into: &buf)
             
@@ -2055,6 +2013,10 @@ public enum PaymentError {
     
     case AlreadyClaimed(message: String)
     
+    case AlreadyPaid(message: String)
+    
+    case PaymentInProgress(message: String)
+    
     case AmountOutOfRange(message: String)
     
     case Generic(message: String)
@@ -2075,7 +2037,11 @@ public enum PaymentError {
     
     case PersistError(message: String)
     
+    case ReceiveError(message: String)
+    
     case Refunded(message: String)
+    
+    case SelfTransferNotSupported(message: String)
     
     case SendError(message: String)
     
@@ -2098,55 +2064,71 @@ public struct FfiConverterTypePaymentError: FfiConverterRustBuffer {
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 2: return .AmountOutOfRange(
+        case 2: return .AlreadyPaid(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 3: return .Generic(
+        case 3: return .PaymentInProgress(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 4: return .InvalidOrExpiredFees(
+        case 4: return .AmountOutOfRange(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 5: return .InsufficientFunds(
+        case 5: return .Generic(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 6: return .InvalidInvoice(
+        case 6: return .InvalidOrExpiredFees(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 7: return .InvalidPreimage(
+        case 7: return .InsufficientFunds(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 8: return .LwkError(
+        case 8: return .InvalidInvoice(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 9: return .PairsNotFound(
+        case 9: return .InvalidPreimage(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 10: return .PaymentTimeout(
+        case 10: return .LwkError(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 11: return .PersistError(
+        case 11: return .PairsNotFound(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 12: return .Refunded(
+        case 12: return .PaymentTimeout(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 13: return .SendError(
+        case 13: return .PersistError(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 14: return .SignerError(
+        case 14: return .ReceiveError(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 15: return .Refunded(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 16: return .SelfTransferNotSupported(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 17: return .SendError(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 18: return .SignerError(
             message: try FfiConverterString.read(from: &buf)
         )
         
@@ -2163,32 +2145,40 @@ public struct FfiConverterTypePaymentError: FfiConverterRustBuffer {
         
         case .AlreadyClaimed(_ /* message is ignored*/):
             writeInt(&buf, Int32(1))
-        case .AmountOutOfRange(_ /* message is ignored*/):
+        case .AlreadyPaid(_ /* message is ignored*/):
             writeInt(&buf, Int32(2))
-        case .Generic(_ /* message is ignored*/):
+        case .PaymentInProgress(_ /* message is ignored*/):
             writeInt(&buf, Int32(3))
-        case .InvalidOrExpiredFees(_ /* message is ignored*/):
+        case .AmountOutOfRange(_ /* message is ignored*/):
             writeInt(&buf, Int32(4))
-        case .InsufficientFunds(_ /* message is ignored*/):
+        case .Generic(_ /* message is ignored*/):
             writeInt(&buf, Int32(5))
-        case .InvalidInvoice(_ /* message is ignored*/):
+        case .InvalidOrExpiredFees(_ /* message is ignored*/):
             writeInt(&buf, Int32(6))
-        case .InvalidPreimage(_ /* message is ignored*/):
+        case .InsufficientFunds(_ /* message is ignored*/):
             writeInt(&buf, Int32(7))
-        case .LwkError(_ /* message is ignored*/):
+        case .InvalidInvoice(_ /* message is ignored*/):
             writeInt(&buf, Int32(8))
-        case .PairsNotFound(_ /* message is ignored*/):
+        case .InvalidPreimage(_ /* message is ignored*/):
             writeInt(&buf, Int32(9))
-        case .PaymentTimeout(_ /* message is ignored*/):
+        case .LwkError(_ /* message is ignored*/):
             writeInt(&buf, Int32(10))
-        case .PersistError(_ /* message is ignored*/):
+        case .PairsNotFound(_ /* message is ignored*/):
             writeInt(&buf, Int32(11))
-        case .Refunded(_ /* message is ignored*/):
+        case .PaymentTimeout(_ /* message is ignored*/):
             writeInt(&buf, Int32(12))
-        case .SendError(_ /* message is ignored*/):
+        case .PersistError(_ /* message is ignored*/):
             writeInt(&buf, Int32(13))
-        case .SignerError(_ /* message is ignored*/):
+        case .ReceiveError(_ /* message is ignored*/):
             writeInt(&buf, Int32(14))
+        case .Refunded(_ /* message is ignored*/):
+            writeInt(&buf, Int32(15))
+        case .SelfTransferNotSupported(_ /* message is ignored*/):
+            writeInt(&buf, Int32(16))
+        case .SendError(_ /* message is ignored*/):
+            writeInt(&buf, Int32(17))
+        case .SignerError(_ /* message is ignored*/):
+            writeInt(&buf, Int32(18))
 
         
         }
@@ -2692,7 +2682,7 @@ private var initializationResult: InitializationResult {
     if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_disconnect() != 31676) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_get_info() != 5563) {
+    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_get_info() != 38166) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_list_payments() != 34268) {
