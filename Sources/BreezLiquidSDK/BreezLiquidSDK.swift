@@ -531,6 +531,10 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func fetchFiatRates() throws  -> [Rate]
     
+    func fetchLightningLimits() throws  -> LightningPaymentLimitsResponse
+    
+    func fetchOnchainLimits() throws  -> OnchainPaymentLimitsResponse
+    
     func getInfo() throws  -> GetInfoResponse
     
     func listFiatCurrencies() throws  -> [FiatCurrency]
@@ -640,6 +644,20 @@ open func disconnect()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkEr
 open func fetchFiatRates()throws  -> [Rate] {
     return try  FfiConverterSequenceTypeRate.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
     uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_fiat_rates(self.uniffiClonePointer(),$0
+    )
+})
+}
+    
+open func fetchLightningLimits()throws  -> LightningPaymentLimitsResponse {
+    return try  FfiConverterTypeLightningPaymentLimitsResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
+    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_lightning_limits(self.uniffiClonePointer(),$0
+    )
+})
+}
+    
+open func fetchOnchainLimits()throws  -> OnchainPaymentLimitsResponse {
+    return try  FfiConverterTypeOnchainPaymentLimitsResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
+    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_onchain_limits(self.uniffiClonePointer(),$0
     )
 })
 }
@@ -1556,6 +1574,128 @@ public func FfiConverterTypeLNInvoice_lower(_ value: LnInvoice) -> RustBuffer {
 }
 
 
+public struct LightningPaymentLimitsResponse {
+    public var send: Limits
+    public var receive: Limits
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(send: Limits, receive: Limits) {
+        self.send = send
+        self.receive = receive
+    }
+}
+
+
+
+extension LightningPaymentLimitsResponse: Equatable, Hashable {
+    public static func ==(lhs: LightningPaymentLimitsResponse, rhs: LightningPaymentLimitsResponse) -> Bool {
+        if lhs.send != rhs.send {
+            return false
+        }
+        if lhs.receive != rhs.receive {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(send)
+        hasher.combine(receive)
+    }
+}
+
+
+public struct FfiConverterTypeLightningPaymentLimitsResponse: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LightningPaymentLimitsResponse {
+        return
+            try LightningPaymentLimitsResponse(
+                send: FfiConverterTypeLimits.read(from: &buf), 
+                receive: FfiConverterTypeLimits.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: LightningPaymentLimitsResponse, into buf: inout [UInt8]) {
+        FfiConverterTypeLimits.write(value.send, into: &buf)
+        FfiConverterTypeLimits.write(value.receive, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeLightningPaymentLimitsResponse_lift(_ buf: RustBuffer) throws -> LightningPaymentLimitsResponse {
+    return try FfiConverterTypeLightningPaymentLimitsResponse.lift(buf)
+}
+
+public func FfiConverterTypeLightningPaymentLimitsResponse_lower(_ value: LightningPaymentLimitsResponse) -> RustBuffer {
+    return FfiConverterTypeLightningPaymentLimitsResponse.lower(value)
+}
+
+
+public struct Limits {
+    public var minSat: UInt64
+    public var maxSat: UInt64
+    public var maxZeroConfSat: UInt64
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(minSat: UInt64, maxSat: UInt64, maxZeroConfSat: UInt64) {
+        self.minSat = minSat
+        self.maxSat = maxSat
+        self.maxZeroConfSat = maxZeroConfSat
+    }
+}
+
+
+
+extension Limits: Equatable, Hashable {
+    public static func ==(lhs: Limits, rhs: Limits) -> Bool {
+        if lhs.minSat != rhs.minSat {
+            return false
+        }
+        if lhs.maxSat != rhs.maxSat {
+            return false
+        }
+        if lhs.maxZeroConfSat != rhs.maxZeroConfSat {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(minSat)
+        hasher.combine(maxSat)
+        hasher.combine(maxZeroConfSat)
+    }
+}
+
+
+public struct FfiConverterTypeLimits: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Limits {
+        return
+            try Limits(
+                minSat: FfiConverterUInt64.read(from: &buf), 
+                maxSat: FfiConverterUInt64.read(from: &buf), 
+                maxZeroConfSat: FfiConverterUInt64.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: Limits, into buf: inout [UInt8]) {
+        FfiConverterUInt64.write(value.minSat, into: &buf)
+        FfiConverterUInt64.write(value.maxSat, into: &buf)
+        FfiConverterUInt64.write(value.maxZeroConfSat, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeLimits_lift(_ buf: RustBuffer) throws -> Limits {
+    return try FfiConverterTypeLimits.lift(buf)
+}
+
+public func FfiConverterTypeLimits_lower(_ value: Limits) -> RustBuffer {
+    return FfiConverterTypeLimits.lower(value)
+}
+
+
 public struct LnUrlAuthRequestData {
     public var k1: String
     public var domain: String
@@ -2398,6 +2538,63 @@ public func FfiConverterTypeMessageSuccessActionData_lift(_ buf: RustBuffer) thr
 
 public func FfiConverterTypeMessageSuccessActionData_lower(_ value: MessageSuccessActionData) -> RustBuffer {
     return FfiConverterTypeMessageSuccessActionData.lower(value)
+}
+
+
+public struct OnchainPaymentLimitsResponse {
+    public var send: Limits
+    public var receive: Limits
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(send: Limits, receive: Limits) {
+        self.send = send
+        self.receive = receive
+    }
+}
+
+
+
+extension OnchainPaymentLimitsResponse: Equatable, Hashable {
+    public static func ==(lhs: OnchainPaymentLimitsResponse, rhs: OnchainPaymentLimitsResponse) -> Bool {
+        if lhs.send != rhs.send {
+            return false
+        }
+        if lhs.receive != rhs.receive {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(send)
+        hasher.combine(receive)
+    }
+}
+
+
+public struct FfiConverterTypeOnchainPaymentLimitsResponse: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> OnchainPaymentLimitsResponse {
+        return
+            try OnchainPaymentLimitsResponse(
+                send: FfiConverterTypeLimits.read(from: &buf), 
+                receive: FfiConverterTypeLimits.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: OnchainPaymentLimitsResponse, into buf: inout [UInt8]) {
+        FfiConverterTypeLimits.write(value.send, into: &buf)
+        FfiConverterTypeLimits.write(value.receive, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeOnchainPaymentLimitsResponse_lift(_ buf: RustBuffer) throws -> OnchainPaymentLimitsResponse {
+    return try FfiConverterTypeOnchainPaymentLimitsResponse.lift(buf)
+}
+
+public func FfiConverterTypeOnchainPaymentLimitsResponse_lower(_ value: OnchainPaymentLimitsResponse) -> RustBuffer {
+    return FfiConverterTypeOnchainPaymentLimitsResponse.lower(value)
 }
 
 
@@ -4744,6 +4941,8 @@ public enum LnUrlWithdrawResult {
     
     case ok(data: LnUrlWithdrawSuccessData
     )
+    case timeout(data: LnUrlWithdrawSuccessData
+    )
     case errorStatus(data: LnUrlErrorData
     )
 }
@@ -4759,7 +4958,10 @@ public struct FfiConverterTypeLnUrlWithdrawResult: FfiConverterRustBuffer {
         case 1: return .ok(data: try FfiConverterTypeLnUrlWithdrawSuccessData.read(from: &buf)
         )
         
-        case 2: return .errorStatus(data: try FfiConverterTypeLnUrlErrorData.read(from: &buf)
+        case 2: return .timeout(data: try FfiConverterTypeLnUrlWithdrawSuccessData.read(from: &buf)
+        )
+        
+        case 3: return .errorStatus(data: try FfiConverterTypeLnUrlErrorData.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -4775,8 +4977,13 @@ public struct FfiConverterTypeLnUrlWithdrawResult: FfiConverterRustBuffer {
             FfiConverterTypeLnUrlWithdrawSuccessData.write(data, into: &buf)
             
         
-        case let .errorStatus(data):
+        case let .timeout(data):
             writeInt(&buf, Int32(2))
+            FfiConverterTypeLnUrlWithdrawSuccessData.write(data, into: &buf)
+            
+        
+        case let .errorStatus(data):
+            writeInt(&buf, Int32(3))
             FfiConverterTypeLnUrlErrorData.write(data, into: &buf)
             
         }
@@ -5833,6 +6040,12 @@ private var initializationResult: InitializationResult {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_fiat_rates() != 52001) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_lightning_limits() != 10780) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_onchain_limits() != 32991) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_get_info() != 38166) {
