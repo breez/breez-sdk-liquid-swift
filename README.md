@@ -1,6 +1,6 @@
 # Breez Liquid SDK — Swift Bindings
 
-The [Breez Liquid SDK](https://github.com/breez/breez-liquid-sdk) enables mobile developers to integrate Liquid into their apps with a very shallow learning curve. More information can be found here: [breez/breez-liquid-sdk](https://github.com/breez/breez-liquid-sdk)
+The [Breez Liquid SDK](https://github.com/breez/breez-sdk-liquid) enables mobile developers to integrate Liquid into their apps with a very shallow learning curve. More information can be found here: [breez/breez-sdk-liquid](https://github.com/breez/breez-sdk-liquid)
 
 This repository maintains the Breez Liquid SDK's official [Swift](https://www.swift.org/) bindings.
 
@@ -15,7 +15,7 @@ We support integration via the [Swift Package Manager](https://www.swift.org/pac
 Via `File > Add Packages...`, add
 
 ```
-https://github.com/breez/breez-liquid-sdk-swift.git
+https://github.com/breez/breez-sdk-liquid-swift.git
 ```
 
 as a package dependency in Xcode.
@@ -25,7 +25,7 @@ as a package dependency in Xcode.
 Add the following to the dependencies array of your `Package.swift`:
 
 ``` swift
-.package(url: "https://github.com/breez/breez-liquid-sdk-swift.git", from: "0.0.1"),
+.package(url: "https://github.com/breez/breez-sdk-liquid-swift.git", from: "0.0.1"),
 ```
 
 ### CocoaPods
@@ -36,12 +36,12 @@ Add the Breez Liquid SDK to your `Podfile` like so:
 target '<YourApp' do
   use_frameworks!
 
-  pod 'BreezLiquidSDK'
+  pod 'BreezSDKLiquid'
 end
 ```
 
 ## 📄 Usage
 
 ``` swift
-import BreezLiquidSDK
+import BreezSDKLiquid
 ```

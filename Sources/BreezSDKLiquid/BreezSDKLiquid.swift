@@ -7,8 +7,8 @@ import Foundation
 // Depending on the consumer's build setup, the low-level FFI code
 // might be in a separate module, or it might be compiled inline into
 // this module. This is a bit of light hackery to work with both.
-#if canImport(breez_liquid_sdkFFI)
-import breez_liquid_sdkFFI
+#if canImport(breez_sdk_liquidFFI)
+import breez_sdk_liquidFFI
 #endif
 
 fileprivate extension RustBuffer {
@@ -25,13 +25,13 @@ fileprivate extension RustBuffer {
     }
 
     static func from(_ ptr: UnsafeBufferPointer<UInt8>) -> RustBuffer {
-        try! rustCall { ffi_breez_liquid_sdk_bindings_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
+        try! rustCall { ffi_breez_sdk_liquid_bindings_rustbuffer_from_bytes(ForeignBytes(bufferPointer: ptr), $0) }
     }
 
     // Frees the buffer in place.
     // The buffer must not be used after this is called.
     func deallocate() {
-        try! rustCall { ffi_breez_liquid_sdk_bindings_rustbuffer_free(self, $0) }
+        try! rustCall { ffi_breez_sdk_liquid_bindings_rustbuffer_free(self, $0) }
     }
 }
 
@@ -605,7 +605,7 @@ open class BindingLiquidSdk:
     }
 
     public func uniffiClonePointer() -> UnsafeMutableRawPointer {
-        return try! rustCall { uniffi_breez_liquid_sdk_bindings_fn_clone_bindingliquidsdk(self.pointer, $0) }
+        return try! rustCall { uniffi_breez_sdk_liquid_bindings_fn_clone_bindingliquidsdk(self.pointer, $0) }
     }
     // No primary constructor declared for this class.
 
@@ -614,7 +614,7 @@ open class BindingLiquidSdk:
             return
         }
 
-        try! rustCall { uniffi_breez_liquid_sdk_bindings_fn_free_bindingliquidsdk(pointer, $0) }
+        try! rustCall { uniffi_breez_sdk_liquid_bindings_fn_free_bindingliquidsdk(pointer, $0) }
     }
 
     
@@ -622,77 +622,77 @@ open class BindingLiquidSdk:
     
 open func addEventListener(listener: EventListener)throws  -> String {
     return try  FfiConverterString.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_add_event_listener(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_add_event_listener(self.uniffiClonePointer(),
         FfiConverterCallbackInterfaceEventListener.lower(listener),$0
     )
 })
 }
     
 open func backup(req: BackupRequest)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_backup(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_backup(self.uniffiClonePointer(),
         FfiConverterTypeBackupRequest.lower(req),$0
     )
 }
 }
     
 open func disconnect()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_disconnect(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_disconnect(self.uniffiClonePointer(),$0
     )
 }
 }
     
 open func fetchFiatRates()throws  -> [Rate] {
     return try  FfiConverterSequenceTypeRate.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_fiat_rates(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_fetch_fiat_rates(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func fetchLightningLimits()throws  -> LightningPaymentLimitsResponse {
     return try  FfiConverterTypeLightningPaymentLimitsResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_lightning_limits(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_fetch_lightning_limits(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func fetchOnchainLimits()throws  -> OnchainPaymentLimitsResponse {
     return try  FfiConverterTypeOnchainPaymentLimitsResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_fetch_onchain_limits(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_fetch_onchain_limits(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func getInfo()throws  -> GetInfoResponse {
     return try  FfiConverterTypeGetInfoResponse.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_get_info(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_get_info(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func listFiatCurrencies()throws  -> [FiatCurrency] {
     return try  FfiConverterSequenceTypeFiatCurrency.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_list_fiat_currencies(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_list_fiat_currencies(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func listPayments()throws  -> [Payment] {
     return try  FfiConverterSequenceTypePayment.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_list_payments(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_list_payments(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func listRefundables()throws  -> [RefundableSwap] {
     return try  FfiConverterSequenceTypeRefundableSwap.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_list_refundables(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_list_refundables(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func lnurlAuth(reqData: LnUrlAuthRequestData)throws  -> LnUrlCallbackStatus {
     return try  FfiConverterTypeLnUrlCallbackStatus.lift(try rustCallWithError(FfiConverterTypeLnUrlAuthError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_lnurl_auth(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_lnurl_auth(self.uniffiClonePointer(),
         FfiConverterTypeLnUrlAuthRequestData.lower(reqData),$0
     )
 })
@@ -700,7 +700,7 @@ open func lnurlAuth(reqData: LnUrlAuthRequestData)throws  -> LnUrlCallbackStatus
     
 open func lnurlPay(req: LnUrlPayRequest)throws  -> LnUrlPayResult {
     return try  FfiConverterTypeLnUrlPayResult.lift(try rustCallWithError(FfiConverterTypeLnUrlPayError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_lnurl_pay(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_lnurl_pay(self.uniffiClonePointer(),
         FfiConverterTypeLnUrlPayRequest.lower(req),$0
     )
 })
@@ -708,7 +708,7 @@ open func lnurlPay(req: LnUrlPayRequest)throws  -> LnUrlPayResult {
     
 open func lnurlWithdraw(req: LnUrlWithdrawRequest)throws  -> LnUrlWithdrawResult {
     return try  FfiConverterTypeLnUrlWithdrawResult.lift(try rustCallWithError(FfiConverterTypeLnUrlWithdrawError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_lnurl_withdraw(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_lnurl_withdraw(self.uniffiClonePointer(),
         FfiConverterTypeLnUrlWithdrawRequest.lower(req),$0
     )
 })
@@ -716,7 +716,7 @@ open func lnurlWithdraw(req: LnUrlWithdrawRequest)throws  -> LnUrlWithdrawResult
     
 open func payOnchain(req: PayOnchainRequest)throws  -> SendPaymentResponse {
     return try  FfiConverterTypeSendPaymentResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_pay_onchain(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_pay_onchain(self.uniffiClonePointer(),
         FfiConverterTypePayOnchainRequest.lower(req),$0
     )
 })
@@ -724,7 +724,7 @@ open func payOnchain(req: PayOnchainRequest)throws  -> SendPaymentResponse {
     
 open func preparePayOnchain(req: PreparePayOnchainRequest)throws  -> PreparePayOnchainResponse {
     return try  FfiConverterTypePreparePayOnchainResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_prepare_pay_onchain(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_pay_onchain(self.uniffiClonePointer(),
         FfiConverterTypePreparePayOnchainRequest.lower(req),$0
     )
 })
@@ -732,7 +732,7 @@ open func preparePayOnchain(req: PreparePayOnchainRequest)throws  -> PreparePayO
     
 open func prepareReceiveOnchain(req: PrepareReceiveOnchainRequest)throws  -> PrepareReceiveOnchainResponse {
     return try  FfiConverterTypePrepareReceiveOnchainResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_prepare_receive_onchain(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_receive_onchain(self.uniffiClonePointer(),
         FfiConverterTypePrepareReceiveOnchainRequest.lower(req),$0
     )
 })
@@ -740,7 +740,7 @@ open func prepareReceiveOnchain(req: PrepareReceiveOnchainRequest)throws  -> Pre
     
 open func prepareReceivePayment(req: PrepareReceiveRequest)throws  -> PrepareReceiveResponse {
     return try  FfiConverterTypePrepareReceiveResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_prepare_receive_payment(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_receive_payment(self.uniffiClonePointer(),
         FfiConverterTypePrepareReceiveRequest.lower(req),$0
     )
 })
@@ -748,7 +748,7 @@ open func prepareReceivePayment(req: PrepareReceiveRequest)throws  -> PrepareRec
     
 open func prepareRefund(req: PrepareRefundRequest)throws  -> PrepareRefundResponse {
     return try  FfiConverterTypePrepareRefundResponse.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_prepare_refund(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_refund(self.uniffiClonePointer(),
         FfiConverterTypePrepareRefundRequest.lower(req),$0
     )
 })
@@ -756,7 +756,7 @@ open func prepareRefund(req: PrepareRefundRequest)throws  -> PrepareRefundRespon
     
 open func prepareSendPayment(req: PrepareSendRequest)throws  -> PrepareSendResponse {
     return try  FfiConverterTypePrepareSendResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_prepare_send_payment(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_send_payment(self.uniffiClonePointer(),
         FfiConverterTypePrepareSendRequest.lower(req),$0
     )
 })
@@ -764,7 +764,7 @@ open func prepareSendPayment(req: PrepareSendRequest)throws  -> PrepareSendRespo
     
 open func receiveOnchain(req: PrepareReceiveOnchainResponse)throws  -> ReceiveOnchainResponse {
     return try  FfiConverterTypeReceiveOnchainResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_receive_onchain(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_receive_onchain(self.uniffiClonePointer(),
         FfiConverterTypePrepareReceiveOnchainResponse.lower(req),$0
     )
 })
@@ -772,7 +772,7 @@ open func receiveOnchain(req: PrepareReceiveOnchainResponse)throws  -> ReceiveOn
     
 open func receivePayment(req: PrepareReceiveResponse)throws  -> ReceivePaymentResponse {
     return try  FfiConverterTypeReceivePaymentResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_receive_payment(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_receive_payment(self.uniffiClonePointer(),
         FfiConverterTypePrepareReceiveResponse.lower(req),$0
     )
 })
@@ -780,27 +780,27 @@ open func receivePayment(req: PrepareReceiveResponse)throws  -> ReceivePaymentRe
     
 open func refund(req: RefundRequest)throws  -> RefundResponse {
     return try  FfiConverterTypeRefundResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_refund(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_refund(self.uniffiClonePointer(),
         FfiConverterTypeRefundRequest.lower(req),$0
     )
 })
 }
     
 open func removeEventListener(id: String)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_remove_event_listener(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_remove_event_listener(self.uniffiClonePointer(),
         FfiConverterString.lower(id),$0
     )
 }
 }
     
 open func rescanOnchainSwaps()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_rescan_onchain_swaps(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_rescan_onchain_swaps(self.uniffiClonePointer(),$0
     )
 }
 }
     
 open func restore(req: RestoreRequest)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_restore(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_restore(self.uniffiClonePointer(),
         FfiConverterTypeRestoreRequest.lower(req),$0
     )
 }
@@ -808,14 +808,14 @@ open func restore(req: RestoreRequest)throws  {try rustCallWithError(FfiConverte
     
 open func sendPayment(req: PrepareSendResponse)throws  -> SendPaymentResponse {
     return try  FfiConverterTypeSendPaymentResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_send_payment(self.uniffiClonePointer(),
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_send_payment(self.uniffiClonePointer(),
         FfiConverterTypePrepareSendResponse.lower(req),$0
     )
 })
 }
     
 open func sync()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_method_bindingliquidsdk_sync(self.uniffiClonePointer(),$0
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_sync(self.uniffiClonePointer(),$0
     )
 }
 }
@@ -5531,7 +5531,7 @@ fileprivate struct UniffiCallbackInterfaceEventListener {
 }
 
 private func uniffiCallbackInitEventListener() {
-    uniffi_breez_liquid_sdk_bindings_fn_init_callback_vtable_eventlistener(&UniffiCallbackInterfaceEventListener.vtable)
+    uniffi_breez_sdk_liquid_bindings_fn_init_callback_vtable_eventlistener(&UniffiCallbackInterfaceEventListener.vtable)
 }
 
 // FfiConverter protocol for callback interfaces
@@ -5612,7 +5612,7 @@ fileprivate struct UniffiCallbackInterfaceLogger {
 }
 
 private func uniffiCallbackInitLogger() {
-    uniffi_breez_liquid_sdk_bindings_fn_init_callback_vtable_logger(&UniffiCallbackInterfaceLogger.vtable)
+    uniffi_breez_sdk_liquid_bindings_fn_init_callback_vtable_logger(&UniffiCallbackInterfaceLogger.vtable)
 }
 
 // FfiConverter protocol for callback interfaces
@@ -5967,34 +5967,34 @@ fileprivate struct FfiConverterSequenceTypeRouteHintHop: FfiConverterRustBuffer 
 }
 public func connect(req: ConnectRequest)throws  -> BindingLiquidSdk {
     return try  FfiConverterTypeBindingLiquidSdk.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_func_connect(
+    uniffi_breez_sdk_liquid_bindings_fn_func_connect(
         FfiConverterTypeConnectRequest.lower(req),$0
     )
 })
 }
 public func defaultConfig(network: LiquidNetwork) -> Config {
     return try!  FfiConverterTypeConfig.lift(try! rustCall() {
-    uniffi_breez_liquid_sdk_bindings_fn_func_default_config(
+    uniffi_breez_sdk_liquid_bindings_fn_func_default_config(
         FfiConverterTypeLiquidNetwork.lower(network),$0
     )
 })
 }
 public func parse(input: String)throws  -> InputType {
     return try  FfiConverterTypeInputType.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_func_parse(
+    uniffi_breez_sdk_liquid_bindings_fn_func_parse(
         FfiConverterString.lower(input),$0
     )
 })
 }
 public func parseInvoice(input: String)throws  -> LnInvoice {
     return try  FfiConverterTypeLNInvoice.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_func_parse_invoice(
+    uniffi_breez_sdk_liquid_bindings_fn_func_parse_invoice(
         FfiConverterString.lower(input),$0
     )
 })
 }
 public func setLogger(logger: Logger)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
-    uniffi_breez_liquid_sdk_bindings_fn_func_set_logger(
+    uniffi_breez_sdk_liquid_bindings_fn_func_set_logger(
         FfiConverterCallbackInterfaceLogger.lower(logger),$0
     )
 }
@@ -6011,110 +6011,110 @@ private var initializationResult: InitializationResult {
     // Get the bindings contract version from our ComponentInterface
     let bindings_contract_version = 26
     // Get the scaffolding contract version by calling the into the dylib
-    let scaffolding_contract_version = ffi_breez_liquid_sdk_bindings_uniffi_contract_version()
+    let scaffolding_contract_version = ffi_breez_sdk_liquid_bindings_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_func_connect() != 18922) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_connect() != 18922) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_func_default_config() != 7519) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_default_config() != 7519) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_func_parse() != 55677) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse() != 55677) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_func_parse_invoice() != 24615) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse_invoice() != 24615) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_func_set_logger() != 34021) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_set_logger() != 34021) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_add_event_listener() != 21118) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_add_event_listener() != 21118) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_backup() != 56517) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_backup() != 56517) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_disconnect() != 31676) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_disconnect() != 31676) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_fiat_rates() != 52001) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_fiat_rates() != 52001) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_lightning_limits() != 10780) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_lightning_limits() != 10780) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_fetch_onchain_limits() != 32991) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_onchain_limits() != 32991) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_get_info() != 38166) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_get_info() != 38166) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_list_fiat_currencies() != 44593) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_fiat_currencies() != 44593) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_list_payments() != 34268) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_payments() != 34268) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_list_refundables() != 38335) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_refundables() != 38335) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_lnurl_auth() != 46998) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_auth() != 46998) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_lnurl_pay() != 46794) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_pay() != 46794) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_lnurl_withdraw() != 9706) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_withdraw() != 9706) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_pay_onchain() != 44319) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_pay_onchain() != 44319) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_prepare_pay_onchain() != 52231) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_pay_onchain() != 52231) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_prepare_receive_onchain() != 16997) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_onchain() != 16997) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_prepare_receive_payment() != 57331) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_payment() != 57331) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_prepare_refund() != 17862) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_refund() != 17862) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_prepare_send_payment() != 35897) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_send_payment() != 35897) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_receive_onchain() != 60045) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_onchain() != 60045) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_receive_payment() != 8257) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_payment() != 8257) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_refund() != 46229) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_refund() != 46229) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_remove_event_listener() != 11780) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_remove_event_listener() != 11780) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_rescan_onchain_swaps() != 40255) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_rescan_onchain_swaps() != 40255) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_restore() != 42575) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_restore() != 42575) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_send_payment() != 37911) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_send_payment() != 37911) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_bindingliquidsdk_sync() != 9045) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_sync() != 9045) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_eventlistener_on_event() != 59532) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_eventlistener_on_event() != 59532) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_liquid_sdk_bindings_checksum_method_logger_log() != 3894) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_logger_log() != 3894) {
         return InitializationResult.apiChecksumMismatch
     }
 
