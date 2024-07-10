@@ -433,19 +433,6 @@ fileprivate struct FfiConverterUInt64: FfiConverterPrimitive {
     }
 }
 
-fileprivate struct FfiConverterFloat: FfiConverterPrimitive {
-    typealias FfiType = Float
-    typealias SwiftType = Float
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Float {
-        return try lift(readFloat(&buf))
-    }
-
-    public static func write(_ value: Float, into buf: inout [UInt8]) {
-        writeFloat(&buf, lower(value))
-    }
-}
-
 fileprivate struct FfiConverterDouble: FfiConverterPrimitive {
     typealias FfiType = Double
     typealias SwiftType = Double
@@ -621,28 +608,28 @@ open class BindingLiquidSdk:
 
     
 open func addEventListener(listener: EventListener)throws  -> String {
-    return try  FfiConverterString.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterString.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_add_event_listener(self.uniffiClonePointer(),
         FfiConverterCallbackInterfaceEventListener.lower(listener),$0
     )
 })
 }
     
-open func backup(req: BackupRequest)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func backup(req: BackupRequest)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_backup(self.uniffiClonePointer(),
         FfiConverterTypeBackupRequest.lower(req),$0
     )
 }
 }
     
-open func disconnect()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func disconnect()throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_disconnect(self.uniffiClonePointer(),$0
     )
 }
 }
     
 open func fetchFiatRates()throws  -> [Rate] {
-    return try  FfiConverterSequenceTypeRate.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterSequenceTypeRate.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_fetch_fiat_rates(self.uniffiClonePointer(),$0
     )
 })
@@ -663,14 +650,14 @@ open func fetchOnchainLimits()throws  -> OnchainPaymentLimitsResponse {
 }
     
 open func getInfo()throws  -> GetInfoResponse {
-    return try  FfiConverterTypeGetInfoResponse.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterTypeGetInfoResponse.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_get_info(self.uniffiClonePointer(),$0
     )
 })
 }
     
 open func listFiatCurrencies()throws  -> [FiatCurrency] {
-    return try  FfiConverterSequenceTypeFiatCurrency.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterSequenceTypeFiatCurrency.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_list_fiat_currencies(self.uniffiClonePointer(),$0
     )
 })
@@ -684,7 +671,7 @@ open func listPayments()throws  -> [Payment] {
 }
     
 open func listRefundables()throws  -> [RefundableSwap] {
-    return try  FfiConverterSequenceTypeRefundableSwap.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterSequenceTypeRefundableSwap.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_list_refundables(self.uniffiClonePointer(),$0
     )
 })
@@ -747,7 +734,7 @@ open func prepareReceivePayment(req: PrepareReceiveRequest)throws  -> PrepareRec
 }
     
 open func prepareRefund(req: PrepareRefundRequest)throws  -> PrepareRefundResponse {
-    return try  FfiConverterTypePrepareRefundResponse.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterTypePrepareRefundResponse.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_prepare_refund(self.uniffiClonePointer(),
         FfiConverterTypePrepareRefundRequest.lower(req),$0
     )
@@ -786,20 +773,20 @@ open func refund(req: RefundRequest)throws  -> RefundResponse {
 })
 }
     
-open func removeEventListener(id: String)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func removeEventListener(id: String)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_remove_event_listener(self.uniffiClonePointer(),
         FfiConverterString.lower(id),$0
     )
 }
 }
     
-open func rescanOnchainSwaps()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func rescanOnchainSwaps()throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_rescan_onchain_swaps(self.uniffiClonePointer(),$0
     )
 }
 }
     
-open func restore(req: RestoreRequest)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func restore(req: RestoreRequest)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_restore(self.uniffiClonePointer(),
         FfiConverterTypeRestoreRequest.lower(req),$0
     )
@@ -814,7 +801,7 @@ open func sendPayment(req: PrepareSendResponse)throws  -> SendPaymentResponse {
 })
 }
     
-open func sync()throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+open func sync()throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_sync(self.uniffiClonePointer(),$0
     )
 }
@@ -1059,18 +1046,18 @@ public struct Config {
     public var workingDir: String
     public var network: LiquidNetwork
     public var paymentTimeoutSec: UInt64
-    public var zeroConfMinFeeRate: Float
+    public var zeroConfMinFeeRateMsat: UInt32
     public var zeroConfMaxAmountSat: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(liquidElectrumUrl: String, bitcoinElectrumUrl: String, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, zeroConfMinFeeRate: Float, zeroConfMaxAmountSat: UInt64?) {
+    public init(liquidElectrumUrl: String, bitcoinElectrumUrl: String, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, zeroConfMinFeeRateMsat: UInt32, zeroConfMaxAmountSat: UInt64?) {
         self.liquidElectrumUrl = liquidElectrumUrl
         self.bitcoinElectrumUrl = bitcoinElectrumUrl
         self.workingDir = workingDir
         self.network = network
         self.paymentTimeoutSec = paymentTimeoutSec
-        self.zeroConfMinFeeRate = zeroConfMinFeeRate
+        self.zeroConfMinFeeRateMsat = zeroConfMinFeeRateMsat
         self.zeroConfMaxAmountSat = zeroConfMaxAmountSat
     }
 }
@@ -1094,7 +1081,7 @@ extension Config: Equatable, Hashable {
         if lhs.paymentTimeoutSec != rhs.paymentTimeoutSec {
             return false
         }
-        if lhs.zeroConfMinFeeRate != rhs.zeroConfMinFeeRate {
+        if lhs.zeroConfMinFeeRateMsat != rhs.zeroConfMinFeeRateMsat {
             return false
         }
         if lhs.zeroConfMaxAmountSat != rhs.zeroConfMaxAmountSat {
@@ -1109,7 +1096,7 @@ extension Config: Equatable, Hashable {
         hasher.combine(workingDir)
         hasher.combine(network)
         hasher.combine(paymentTimeoutSec)
-        hasher.combine(zeroConfMinFeeRate)
+        hasher.combine(zeroConfMinFeeRateMsat)
         hasher.combine(zeroConfMaxAmountSat)
     }
 }
@@ -1124,7 +1111,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
                 workingDir: FfiConverterString.read(from: &buf), 
                 network: FfiConverterTypeLiquidNetwork.read(from: &buf), 
                 paymentTimeoutSec: FfiConverterUInt64.read(from: &buf), 
-                zeroConfMinFeeRate: FfiConverterFloat.read(from: &buf), 
+                zeroConfMinFeeRateMsat: FfiConverterUInt32.read(from: &buf), 
                 zeroConfMaxAmountSat: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
@@ -1135,7 +1122,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
         FfiConverterString.write(value.workingDir, into: &buf)
         FfiConverterTypeLiquidNetwork.write(value.network, into: &buf)
         FfiConverterUInt64.write(value.paymentTimeoutSec, into: &buf)
-        FfiConverterFloat.write(value.zeroConfMinFeeRate, into: &buf)
+        FfiConverterUInt32.write(value.zeroConfMinFeeRateMsat, into: &buf)
         FfiConverterOptionUInt64.write(value.zeroConfMaxAmountSat, into: &buf)
     }
 }
@@ -4299,189 +4286,6 @@ extension LiquidNetwork: Equatable, Hashable {}
 
 
 
-/**
- * /////////////////////////////
- */
-public enum LiquidSdkError {
-
-    
-    
-    case AlreadyStarted(message: String)
-    
-    case Generic(message: String)
-    
-    case NotStarted(message: String)
-    
-    case ServiceConnectivity(message: String)
-    
-}
-
-
-public struct FfiConverterTypeLiquidSdkError: FfiConverterRustBuffer {
-    typealias SwiftType = LiquidSdkError
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LiquidSdkError {
-        let variant: Int32 = try readInt(&buf)
-        switch variant {
-
-        
-
-        
-        case 1: return .AlreadyStarted(
-            message: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 2: return .Generic(
-            message: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 3: return .NotStarted(
-            message: try FfiConverterString.read(from: &buf)
-        )
-        
-        case 4: return .ServiceConnectivity(
-            message: try FfiConverterString.read(from: &buf)
-        )
-        
-
-        default: throw UniffiInternalError.unexpectedEnumCase
-        }
-    }
-
-    public static func write(_ value: LiquidSdkError, into buf: inout [UInt8]) {
-        switch value {
-
-        
-
-        
-        case .AlreadyStarted(_ /* message is ignored*/):
-            writeInt(&buf, Int32(1))
-        case .Generic(_ /* message is ignored*/):
-            writeInt(&buf, Int32(2))
-        case .NotStarted(_ /* message is ignored*/):
-            writeInt(&buf, Int32(3))
-        case .ServiceConnectivity(_ /* message is ignored*/):
-            writeInt(&buf, Int32(4))
-
-        
-        }
-    }
-}
-
-
-extension LiquidSdkError: Equatable, Hashable {}
-
-extension LiquidSdkError: Error { }
-
-// Note that we don't yet support `indirect` for enums.
-// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
-
-public enum LiquidSdkEvent {
-    
-    case paymentFailed(details: Payment
-    )
-    case paymentPending(details: Payment
-    )
-    case paymentRefunded(details: Payment
-    )
-    case paymentRefundPending(details: Payment
-    )
-    case paymentSucceeded(details: Payment
-    )
-    case paymentWaitingConfirmation(details: Payment
-    )
-    case synced
-}
-
-
-public struct FfiConverterTypeLiquidSdkEvent: FfiConverterRustBuffer {
-    typealias SwiftType = LiquidSdkEvent
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LiquidSdkEvent {
-        let variant: Int32 = try readInt(&buf)
-        switch variant {
-        
-        case 1: return .paymentFailed(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 2: return .paymentPending(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 3: return .paymentRefunded(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 4: return .paymentRefundPending(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 5: return .paymentSucceeded(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 6: return .paymentWaitingConfirmation(details: try FfiConverterTypePayment.read(from: &buf)
-        )
-        
-        case 7: return .synced
-        
-        default: throw UniffiInternalError.unexpectedEnumCase
-        }
-    }
-
-    public static func write(_ value: LiquidSdkEvent, into buf: inout [UInt8]) {
-        switch value {
-        
-        
-        case let .paymentFailed(details):
-            writeInt(&buf, Int32(1))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case let .paymentPending(details):
-            writeInt(&buf, Int32(2))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case let .paymentRefunded(details):
-            writeInt(&buf, Int32(3))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case let .paymentRefundPending(details):
-            writeInt(&buf, Int32(4))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case let .paymentSucceeded(details):
-            writeInt(&buf, Int32(5))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case let .paymentWaitingConfirmation(details):
-            writeInt(&buf, Int32(6))
-            FfiConverterTypePayment.write(details, into: &buf)
-            
-        
-        case .synced:
-            writeInt(&buf, Int32(7))
-        
-        }
-    }
-}
-
-
-public func FfiConverterTypeLiquidSdkEvent_lift(_ buf: RustBuffer) throws -> LiquidSdkEvent {
-    return try FfiConverterTypeLiquidSdkEvent.lift(buf)
-}
-
-public func FfiConverterTypeLiquidSdkEvent_lower(_ value: LiquidSdkEvent) -> RustBuffer {
-    return FfiConverterTypeLiquidSdkEvent.lower(value)
-}
-
-
-
-extension LiquidSdkEvent: Equatable, Hashable {}
-
-
-
-
 public enum LnUrlAuthError {
 
     
@@ -5403,6 +5207,189 @@ extension PaymentType: Equatable, Hashable {}
 
 
 
+
+/**
+ * /////////////////////////////
+ */
+public enum SdkError {
+
+    
+    
+    case AlreadyStarted(message: String)
+    
+    case Generic(message: String)
+    
+    case NotStarted(message: String)
+    
+    case ServiceConnectivity(message: String)
+    
+}
+
+
+public struct FfiConverterTypeSdkError: FfiConverterRustBuffer {
+    typealias SwiftType = SdkError
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SdkError {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+
+        
+
+        
+        case 1: return .AlreadyStarted(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 2: return .Generic(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 3: return .NotStarted(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 4: return .ServiceConnectivity(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: SdkError, into buf: inout [UInt8]) {
+        switch value {
+
+        
+
+        
+        case .AlreadyStarted(_ /* message is ignored*/):
+            writeInt(&buf, Int32(1))
+        case .Generic(_ /* message is ignored*/):
+            writeInt(&buf, Int32(2))
+        case .NotStarted(_ /* message is ignored*/):
+            writeInt(&buf, Int32(3))
+        case .ServiceConnectivity(_ /* message is ignored*/):
+            writeInt(&buf, Int32(4))
+
+        
+        }
+    }
+}
+
+
+extension SdkError: Equatable, Hashable {}
+
+extension SdkError: Error { }
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+
+public enum SdkEvent {
+    
+    case paymentFailed(details: Payment
+    )
+    case paymentPending(details: Payment
+    )
+    case paymentRefunded(details: Payment
+    )
+    case paymentRefundPending(details: Payment
+    )
+    case paymentSucceeded(details: Payment
+    )
+    case paymentWaitingConfirmation(details: Payment
+    )
+    case synced
+}
+
+
+public struct FfiConverterTypeSdkEvent: FfiConverterRustBuffer {
+    typealias SwiftType = SdkEvent
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SdkEvent {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .paymentFailed(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 2: return .paymentPending(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 3: return .paymentRefunded(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 4: return .paymentRefundPending(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 5: return .paymentSucceeded(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 6: return .paymentWaitingConfirmation(details: try FfiConverterTypePayment.read(from: &buf)
+        )
+        
+        case 7: return .synced
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: SdkEvent, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .paymentFailed(details):
+            writeInt(&buf, Int32(1))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case let .paymentPending(details):
+            writeInt(&buf, Int32(2))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case let .paymentRefunded(details):
+            writeInt(&buf, Int32(3))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case let .paymentRefundPending(details):
+            writeInt(&buf, Int32(4))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case let .paymentSucceeded(details):
+            writeInt(&buf, Int32(5))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case let .paymentWaitingConfirmation(details):
+            writeInt(&buf, Int32(6))
+            FfiConverterTypePayment.write(details, into: &buf)
+            
+        
+        case .synced:
+            writeInt(&buf, Int32(7))
+        
+        }
+    }
+}
+
+
+public func FfiConverterTypeSdkEvent_lift(_ buf: RustBuffer) throws -> SdkEvent {
+    return try FfiConverterTypeSdkEvent.lift(buf)
+}
+
+public func FfiConverterTypeSdkEvent_lower(_ value: SdkEvent) -> RustBuffer {
+    return FfiConverterTypeSdkEvent.lower(value)
+}
+
+
+
+extension SdkEvent: Equatable, Hashable {}
+
+
+
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 
@@ -5479,7 +5466,7 @@ extension SuccessActionProcessed: Equatable, Hashable {}
 
 public protocol EventListener : AnyObject {
     
-    func onEvent(e: LiquidSdkEvent) 
+    func onEvent(e: SdkEvent) 
     
 }
 
@@ -5509,7 +5496,7 @@ fileprivate struct UniffiCallbackInterfaceEventListener {
                     throw UniffiInternalError.unexpectedStaleHandle
                 }
                 return uniffiObj.onEvent(
-                     e: try FfiConverterTypeLiquidSdkEvent.lift(e)
+                     e: try FfiConverterTypeSdkEvent.lift(e)
                 )
             }
 
@@ -5966,7 +5953,7 @@ fileprivate struct FfiConverterSequenceTypeRouteHintHop: FfiConverterRustBuffer 
     }
 }
 public func connect(req: ConnectRequest)throws  -> BindingLiquidSdk {
-    return try  FfiConverterTypeBindingLiquidSdk.lift(try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+    return try  FfiConverterTypeBindingLiquidSdk.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_func_connect(
         FfiConverterTypeConnectRequest.lower(req),$0
     )
@@ -5993,7 +5980,7 @@ public func parseInvoice(input: String)throws  -> LnInvoice {
     )
 })
 }
-public func setLogger(logger: Logger)throws  {try rustCallWithError(FfiConverterTypeLiquidSdkError.lift) {
+public func setLogger(logger: Logger)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_func_set_logger(
         FfiConverterCallbackInterfaceLogger.lower(logger),$0
     )
@@ -6015,106 +6002,106 @@ private var initializationResult: InitializationResult {
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_func_connect() != 18922) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_connect() != 39960) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_func_default_config() != 7519) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_default_config() != 36535) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse() != 55677) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse() != 40079) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse_invoice() != 24615) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_parse_invoice() != 45284) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_func_set_logger() != 34021) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_func_set_logger() != 32375) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_add_event_listener() != 21118) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_add_event_listener() != 65289) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_backup() != 56517) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_backup() != 3592) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_disconnect() != 31676) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_disconnect() != 37717) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_fiat_rates() != 52001) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_fiat_rates() != 61824) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_lightning_limits() != 10780) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_lightning_limits() != 61822) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_onchain_limits() != 32991) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_fetch_onchain_limits() != 51575) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_get_info() != 38166) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_get_info() != 4290) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_fiat_currencies() != 44593) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_fiat_currencies() != 38203) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_payments() != 34268) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_payments() != 38113) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_refundables() != 38335) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_list_refundables() != 22886) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_auth() != 46998) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_auth() != 58655) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_pay() != 46794) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_pay() != 46650) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_withdraw() != 9706) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_lnurl_withdraw() != 60533) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_pay_onchain() != 44319) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_pay_onchain() != 46079) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_pay_onchain() != 52231) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_pay_onchain() != 1876) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_onchain() != 16997) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_onchain() != 48074) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_payment() != 57331) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_receive_payment() != 28769) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_refund() != 17862) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_refund() != 53467) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_send_payment() != 35897) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_prepare_send_payment() != 1183) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_onchain() != 60045) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_onchain() != 53597) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_payment() != 8257) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_receive_payment() != 48554) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_refund() != 46229) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_refund() != 31475) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_remove_event_listener() != 11780) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_remove_event_listener() != 16569) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_rescan_onchain_swaps() != 40255) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_rescan_onchain_swaps() != 14305) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_restore() != 42575) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_restore() != 63590) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_send_payment() != 37911) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_send_payment() != 61467) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_sync() != 9045) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_sync() != 31783) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_eventlistener_on_event() != 59532) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_eventlistener_on_event() != 22441) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_breez_sdk_liquid_bindings_checksum_method_logger_log() != 3894) {
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_logger_log() != 36218) {
         return InitializationResult.apiChecksumMismatch
     }
 
