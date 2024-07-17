@@ -2897,7 +2897,7 @@ public struct PreparePayOnchainRequest {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(receiverAmountSat: UInt64, satPerVbyte: UInt32?) {
+    public init(receiverAmountSat: UInt64, satPerVbyte: UInt32? = nil) {
         self.receiverAmountSat = receiverAmountSat
         self.satPerVbyte = satPerVbyte
     }
