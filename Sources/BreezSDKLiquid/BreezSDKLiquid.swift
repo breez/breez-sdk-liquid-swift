@@ -529,6 +529,8 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func buyBitcoin(req: BuyBitcoinRequest) throws  -> String
     
+    func checkMessage(req: CheckMessageRequest) throws  -> CheckMessageResponse
+    
     func disconnect() throws 
     
     func fetchFiatRates() throws  -> [Rate]
@@ -573,6 +575,8 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func refund(req: RefundRequest) throws  -> RefundResponse
     
+    func registerWebhook(webhookUrl: String) throws 
+    
     func removeEventListener(id: String) throws 
     
     func rescanOnchainSwaps() throws 
@@ -581,7 +585,11 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func sendPayment(req: PrepareSendResponse) throws  -> SendPaymentResponse
     
+    func signMessage(req: SignMessageRequest) throws  -> SignMessageResponse
+    
     func sync() throws 
+    
+    func unregisterWebhook() throws 
     
 }
 
@@ -645,6 +653,14 @@ open func buyBitcoin(req: BuyBitcoinRequest)throws  -> String {
     return try  FfiConverterString.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_buy_bitcoin(self.uniffiClonePointer(),
         FfiConverterTypeBuyBitcoinRequest.lower(req),$0
+    )
+})
+}
+    
+open func checkMessage(req: CheckMessageRequest)throws  -> CheckMessageResponse {
+    return try  FfiConverterTypeCheckMessageResponse.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_check_message(self.uniffiClonePointer(),
+        FfiConverterTypeCheckMessageRequest.lower(req),$0
     )
 })
 }
@@ -816,6 +832,13 @@ open func refund(req: RefundRequest)throws  -> RefundResponse {
 })
 }
     
+open func registerWebhook(webhookUrl: String)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_register_webhook(self.uniffiClonePointer(),
+        FfiConverterString.lower(webhookUrl),$0
+    )
+}
+}
+    
 open func removeEventListener(id: String)throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_remove_event_listener(self.uniffiClonePointer(),
         FfiConverterString.lower(id),$0
@@ -844,8 +867,22 @@ open func sendPayment(req: PrepareSendResponse)throws  -> SendPaymentResponse {
 })
 }
     
+open func signMessage(req: SignMessageRequest)throws  -> SignMessageResponse {
+    return try  FfiConverterTypeSignMessageResponse.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_sign_message(self.uniffiClonePointer(),
+        FfiConverterTypeSignMessageRequest.lower(req),$0
+    )
+})
+}
+    
 open func sync()throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_sync(self.uniffiClonePointer(),$0
+    )
+}
+}
+    
+open func unregisterWebhook()throws  {try rustCallWithError(FfiConverterTypeSdkError.lift) {
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_unregister_webhook(self.uniffiClonePointer(),$0
     )
 }
 }
@@ -1137,6 +1174,120 @@ public func FfiConverterTypeBuyBitcoinRequest_lift(_ buf: RustBuffer) throws -> 
 
 public func FfiConverterTypeBuyBitcoinRequest_lower(_ value: BuyBitcoinRequest) -> RustBuffer {
     return FfiConverterTypeBuyBitcoinRequest.lower(value)
+}
+
+
+public struct CheckMessageRequest {
+    public var message: String
+    public var pubkey: String
+    public var signature: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(message: String, pubkey: String, signature: String) {
+        self.message = message
+        self.pubkey = pubkey
+        self.signature = signature
+    }
+}
+
+
+
+extension CheckMessageRequest: Equatable, Hashable {
+    public static func ==(lhs: CheckMessageRequest, rhs: CheckMessageRequest) -> Bool {
+        if lhs.message != rhs.message {
+            return false
+        }
+        if lhs.pubkey != rhs.pubkey {
+            return false
+        }
+        if lhs.signature != rhs.signature {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(message)
+        hasher.combine(pubkey)
+        hasher.combine(signature)
+    }
+}
+
+
+public struct FfiConverterTypeCheckMessageRequest: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> CheckMessageRequest {
+        return
+            try CheckMessageRequest(
+                message: FfiConverterString.read(from: &buf), 
+                pubkey: FfiConverterString.read(from: &buf), 
+                signature: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: CheckMessageRequest, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.message, into: &buf)
+        FfiConverterString.write(value.pubkey, into: &buf)
+        FfiConverterString.write(value.signature, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeCheckMessageRequest_lift(_ buf: RustBuffer) throws -> CheckMessageRequest {
+    return try FfiConverterTypeCheckMessageRequest.lift(buf)
+}
+
+public func FfiConverterTypeCheckMessageRequest_lower(_ value: CheckMessageRequest) -> RustBuffer {
+    return FfiConverterTypeCheckMessageRequest.lower(value)
+}
+
+
+public struct CheckMessageResponse {
+    public var isValid: Bool
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(isValid: Bool) {
+        self.isValid = isValid
+    }
+}
+
+
+
+extension CheckMessageResponse: Equatable, Hashable {
+    public static func ==(lhs: CheckMessageResponse, rhs: CheckMessageResponse) -> Bool {
+        if lhs.isValid != rhs.isValid {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isValid)
+    }
+}
+
+
+public struct FfiConverterTypeCheckMessageResponse: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> CheckMessageResponse {
+        return
+            try CheckMessageResponse(
+                isValid: FfiConverterBool.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: CheckMessageResponse, into buf: inout [UInt8]) {
+        FfiConverterBool.write(value.isValid, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeCheckMessageResponse_lift(_ buf: RustBuffer) throws -> CheckMessageResponse {
+    return try FfiConverterTypeCheckMessageResponse.lift(buf)
+}
+
+public func FfiConverterTypeCheckMessageResponse_lower(_ value: CheckMessageResponse) -> RustBuffer {
+    return FfiConverterTypeCheckMessageResponse.lower(value)
 }
 
 
@@ -3785,12 +3936,14 @@ public func FfiConverterTypeReceiveOnchainResponse_lower(_ value: ReceiveOnchain
 public struct ReceivePaymentRequest {
     public var prepareRes: PrepareReceivePaymentResponse
     public var description: String?
+    public var useDescriptionHash: Bool?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(prepareRes: PrepareReceivePaymentResponse, description: String? = nil) {
+    public init(prepareRes: PrepareReceivePaymentResponse, description: String? = nil, useDescriptionHash: Bool? = nil) {
         self.prepareRes = prepareRes
         self.description = description
+        self.useDescriptionHash = useDescriptionHash
     }
 }
 
@@ -3804,12 +3957,16 @@ extension ReceivePaymentRequest: Equatable, Hashable {
         if lhs.description != rhs.description {
             return false
         }
+        if lhs.useDescriptionHash != rhs.useDescriptionHash {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(prepareRes)
         hasher.combine(description)
+        hasher.combine(useDescriptionHash)
     }
 }
 
@@ -3819,13 +3976,15 @@ public struct FfiConverterTypeReceivePaymentRequest: FfiConverterRustBuffer {
         return
             try ReceivePaymentRequest(
                 prepareRes: FfiConverterTypePrepareReceivePaymentResponse.read(from: &buf), 
-                description: FfiConverterOptionString.read(from: &buf)
+                description: FfiConverterOptionString.read(from: &buf), 
+                useDescriptionHash: FfiConverterOptionBool.read(from: &buf)
         )
     }
 
     public static func write(_ value: ReceivePaymentRequest, into buf: inout [UInt8]) {
         FfiConverterTypePrepareReceivePaymentResponse.write(value.prepareRes, into: &buf)
         FfiConverterOptionString.write(value.description, into: &buf)
+        FfiConverterOptionBool.write(value.useDescriptionHash, into: &buf)
     }
 }
 
@@ -4397,6 +4556,104 @@ public func FfiConverterTypeSendPaymentResponse_lift(_ buf: RustBuffer) throws -
 
 public func FfiConverterTypeSendPaymentResponse_lower(_ value: SendPaymentResponse) -> RustBuffer {
     return FfiConverterTypeSendPaymentResponse.lower(value)
+}
+
+
+public struct SignMessageRequest {
+    public var message: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(message: String) {
+        self.message = message
+    }
+}
+
+
+
+extension SignMessageRequest: Equatable, Hashable {
+    public static func ==(lhs: SignMessageRequest, rhs: SignMessageRequest) -> Bool {
+        if lhs.message != rhs.message {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(message)
+    }
+}
+
+
+public struct FfiConverterTypeSignMessageRequest: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SignMessageRequest {
+        return
+            try SignMessageRequest(
+                message: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: SignMessageRequest, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.message, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeSignMessageRequest_lift(_ buf: RustBuffer) throws -> SignMessageRequest {
+    return try FfiConverterTypeSignMessageRequest.lift(buf)
+}
+
+public func FfiConverterTypeSignMessageRequest_lower(_ value: SignMessageRequest) -> RustBuffer {
+    return FfiConverterTypeSignMessageRequest.lower(value)
+}
+
+
+public struct SignMessageResponse {
+    public var signature: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(signature: String) {
+        self.signature = signature
+    }
+}
+
+
+
+extension SignMessageResponse: Equatable, Hashable {
+    public static func ==(lhs: SignMessageResponse, rhs: SignMessageResponse) -> Bool {
+        if lhs.signature != rhs.signature {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(signature)
+    }
+}
+
+
+public struct FfiConverterTypeSignMessageResponse: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SignMessageResponse {
+        return
+            try SignMessageResponse(
+                signature: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: SignMessageResponse, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.signature, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeSignMessageResponse_lift(_ buf: RustBuffer) throws -> SignMessageResponse {
+    return try FfiConverterTypeSignMessageResponse.lift(buf)
+}
+
+public func FfiConverterTypeSignMessageResponse_lower(_ value: SignMessageResponse) -> RustBuffer {
+    return FfiConverterTypeSignMessageResponse.lower(value)
 }
 
 
@@ -5434,6 +5691,8 @@ public enum PaymentError {
     
     case InsufficientFunds(message: String)
     
+    case InvalidDescription(message: String)
+    
     case InvalidInvoice(message: String)
     
     case InvalidPreimage(message: String)
@@ -5497,47 +5756,51 @@ public struct FfiConverterTypePaymentError: FfiConverterRustBuffer {
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 8: return .InvalidInvoice(
+        case 8: return .InvalidDescription(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 9: return .InvalidPreimage(
+        case 9: return .InvalidInvoice(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 10: return .LwkError(
+        case 10: return .InvalidPreimage(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 11: return .PairsNotFound(
+        case 11: return .LwkError(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 12: return .PaymentTimeout(
+        case 12: return .PairsNotFound(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 13: return .PersistError(
+        case 13: return .PaymentTimeout(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 14: return .ReceiveError(
+        case 14: return .PersistError(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 15: return .Refunded(
+        case 15: return .ReceiveError(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 16: return .SelfTransferNotSupported(
+        case 16: return .Refunded(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 17: return .SendError(
+        case 17: return .SelfTransferNotSupported(
             message: try FfiConverterString.read(from: &buf)
         )
         
-        case 18: return .SignerError(
+        case 18: return .SendError(
+            message: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 19: return .SignerError(
             message: try FfiConverterString.read(from: &buf)
         )
         
@@ -5566,28 +5829,30 @@ public struct FfiConverterTypePaymentError: FfiConverterRustBuffer {
             writeInt(&buf, Int32(6))
         case .InsufficientFunds(_ /* message is ignored*/):
             writeInt(&buf, Int32(7))
-        case .InvalidInvoice(_ /* message is ignored*/):
+        case .InvalidDescription(_ /* message is ignored*/):
             writeInt(&buf, Int32(8))
-        case .InvalidPreimage(_ /* message is ignored*/):
+        case .InvalidInvoice(_ /* message is ignored*/):
             writeInt(&buf, Int32(9))
-        case .LwkError(_ /* message is ignored*/):
+        case .InvalidPreimage(_ /* message is ignored*/):
             writeInt(&buf, Int32(10))
-        case .PairsNotFound(_ /* message is ignored*/):
+        case .LwkError(_ /* message is ignored*/):
             writeInt(&buf, Int32(11))
-        case .PaymentTimeout(_ /* message is ignored*/):
+        case .PairsNotFound(_ /* message is ignored*/):
             writeInt(&buf, Int32(12))
-        case .PersistError(_ /* message is ignored*/):
+        case .PaymentTimeout(_ /* message is ignored*/):
             writeInt(&buf, Int32(13))
-        case .ReceiveError(_ /* message is ignored*/):
+        case .PersistError(_ /* message is ignored*/):
             writeInt(&buf, Int32(14))
-        case .Refunded(_ /* message is ignored*/):
+        case .ReceiveError(_ /* message is ignored*/):
             writeInt(&buf, Int32(15))
-        case .SelfTransferNotSupported(_ /* message is ignored*/):
+        case .Refunded(_ /* message is ignored*/):
             writeInt(&buf, Int32(16))
-        case .SendError(_ /* message is ignored*/):
+        case .SelfTransferNotSupported(_ /* message is ignored*/):
             writeInt(&buf, Int32(17))
-        case .SignerError(_ /* message is ignored*/):
+        case .SendError(_ /* message is ignored*/):
             writeInt(&buf, Int32(18))
+        case .SignerError(_ /* message is ignored*/):
+            writeInt(&buf, Int32(19))
 
         
         }
@@ -6627,6 +6892,9 @@ private var initializationResult: InitializationResult {
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_buy_bitcoin() != 53022) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_check_message() != 64029) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_disconnect() != 37717) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -6693,6 +6961,9 @@ private var initializationResult: InitializationResult {
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_refund() != 31475) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_register_webhook() != 3912) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_remove_event_listener() != 16569) {
         return InitializationResult.apiChecksumMismatch
     }
@@ -6705,7 +6976,13 @@ private var initializationResult: InitializationResult {
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_send_payment() != 61467) {
         return InitializationResult.apiChecksumMismatch
     }
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_sign_message() != 33731) {
+        return InitializationResult.apiChecksumMismatch
+    }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_sync() != 31783) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_unregister_webhook() != 34970) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_eventlistener_on_event() != 22441) {
