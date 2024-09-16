@@ -3159,13 +3159,13 @@ public func FfiConverterTypePrepareBuyBitcoinResponse_lower(_ value: PrepareBuyB
 
 
 public struct PreparePayOnchainRequest {
-    public var receiverAmountSat: UInt64
+    public var amount: PayOnchainAmount
     public var satPerVbyte: UInt32?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(receiverAmountSat: UInt64, satPerVbyte: UInt32? = nil) {
-        self.receiverAmountSat = receiverAmountSat
+    public init(amount: PayOnchainAmount, satPerVbyte: UInt32? = nil) {
+        self.amount = amount
         self.satPerVbyte = satPerVbyte
     }
 }
@@ -3173,7 +3173,7 @@ public struct PreparePayOnchainRequest {
 
 extension PreparePayOnchainRequest: Equatable, Hashable {
     public static func ==(lhs: PreparePayOnchainRequest, rhs: PreparePayOnchainRequest) -> Bool {
-        if lhs.receiverAmountSat != rhs.receiverAmountSat {
+        if lhs.amount != rhs.amount {
             return false
         }
         if lhs.satPerVbyte != rhs.satPerVbyte {
@@ -3183,7 +3183,7 @@ extension PreparePayOnchainRequest: Equatable, Hashable {
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(receiverAmountSat)
+        hasher.combine(amount)
         hasher.combine(satPerVbyte)
     }
 }
@@ -3192,13 +3192,13 @@ extension PreparePayOnchainRequest: Equatable, Hashable {
 public struct FfiConverterTypePreparePayOnchainRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PreparePayOnchainRequest {
         return try PreparePayOnchainRequest(
-            receiverAmountSat: FfiConverterUInt64.read(from: &buf), 
+            amount: FfiConverterTypePayOnchainAmount.read(from: &buf), 
             satPerVbyte: FfiConverterOptionUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: PreparePayOnchainRequest, into buf: inout [UInt8]) {
-        FfiConverterUInt64.write(value.receiverAmountSat, into: &buf)
+        FfiConverterTypePayOnchainAmount.write(value.amount, into: &buf)
         FfiConverterOptionUInt32.write(value.satPerVbyte, into: &buf)
     }
 }
@@ -5403,6 +5403,61 @@ public func FfiConverterTypeNetwork_lower(_ value: Network) -> RustBuffer {
 
 
 extension Network: Equatable, Hashable {}
+
+
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+public enum PayOnchainAmount {
+    
+    case receiver(amountSat: UInt64)
+    case drain
+}
+
+public struct FfiConverterTypePayOnchainAmount: FfiConverterRustBuffer {
+    typealias SwiftType = PayOnchainAmount
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PayOnchainAmount {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .receiver(
+            amountSat: try FfiConverterUInt64.read(from: &buf)
+        )
+        
+        case 2: return .drain
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: PayOnchainAmount, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .receiver(amountSat):
+            writeInt(&buf, Int32(1))
+            FfiConverterUInt64.write(amountSat, into: &buf)
+            
+        
+        case .drain:
+            writeInt(&buf, Int32(2))
+        
+        }
+    }
+}
+
+
+public func FfiConverterTypePayOnchainAmount_lift(_ buf: RustBuffer) throws -> PayOnchainAmount {
+    return try FfiConverterTypePayOnchainAmount.lift(buf)
+}
+
+public func FfiConverterTypePayOnchainAmount_lower(_ value: PayOnchainAmount) -> RustBuffer {
+    return FfiConverterTypePayOnchainAmount.lower(value)
+}
+
+
+extension PayOnchainAmount: Equatable, Hashable {}
 
 
 
