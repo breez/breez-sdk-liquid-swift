@@ -3168,13 +3168,13 @@ public func FfiConverterTypePrepareBuyBitcoinResponse_lower(_ value: PrepareBuyB
 
 public struct PreparePayOnchainRequest {
     public var amount: PayOnchainAmount
-    public var feeRateMsatPerVbyte: UInt32?
+    public var feeRateSatPerVbyte: UInt32?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(amount: PayOnchainAmount, feeRateMsatPerVbyte: UInt32? = nil) {
+    public init(amount: PayOnchainAmount, feeRateSatPerVbyte: UInt32? = nil) {
         self.amount = amount
-        self.feeRateMsatPerVbyte = feeRateMsatPerVbyte
+        self.feeRateSatPerVbyte = feeRateSatPerVbyte
     }
 }
 
@@ -3184,7 +3184,7 @@ extension PreparePayOnchainRequest: Equatable, Hashable {
         if lhs.amount != rhs.amount {
             return false
         }
-        if lhs.feeRateMsatPerVbyte != rhs.feeRateMsatPerVbyte {
+        if lhs.feeRateSatPerVbyte != rhs.feeRateSatPerVbyte {
             return false
         }
         return true
@@ -3192,7 +3192,7 @@ extension PreparePayOnchainRequest: Equatable, Hashable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(amount)
-        hasher.combine(feeRateMsatPerVbyte)
+        hasher.combine(feeRateSatPerVbyte)
     }
 }
 
@@ -3201,13 +3201,13 @@ public struct FfiConverterTypePreparePayOnchainRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PreparePayOnchainRequest {
         return try PreparePayOnchainRequest(
             amount: FfiConverterTypePayOnchainAmount.read(from: &buf), 
-            feeRateMsatPerVbyte: FfiConverterOptionUInt32.read(from: &buf)
+            feeRateSatPerVbyte: FfiConverterOptionUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: PreparePayOnchainRequest, into buf: inout [UInt8]) {
         FfiConverterTypePayOnchainAmount.write(value.amount, into: &buf)
-        FfiConverterOptionUInt32.write(value.feeRateMsatPerVbyte, into: &buf)
+        FfiConverterOptionUInt32.write(value.feeRateSatPerVbyte, into: &buf)
     }
 }
 
@@ -3405,14 +3405,14 @@ public func FfiConverterTypePrepareReceiveResponse_lower(_ value: PrepareReceive
 public struct PrepareRefundRequest {
     public var swapAddress: String
     public var refundAddress: String
-    public var feeRateMsatPerVbyte: UInt32
+    public var feeRateSatPerVbyte: UInt32
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(swapAddress: String, refundAddress: String, feeRateMsatPerVbyte: UInt32) {
+    public init(swapAddress: String, refundAddress: String, feeRateSatPerVbyte: UInt32) {
         self.swapAddress = swapAddress
         self.refundAddress = refundAddress
-        self.feeRateMsatPerVbyte = feeRateMsatPerVbyte
+        self.feeRateSatPerVbyte = feeRateSatPerVbyte
     }
 }
 
@@ -3425,7 +3425,7 @@ extension PrepareRefundRequest: Equatable, Hashable {
         if lhs.refundAddress != rhs.refundAddress {
             return false
         }
-        if lhs.feeRateMsatPerVbyte != rhs.feeRateMsatPerVbyte {
+        if lhs.feeRateSatPerVbyte != rhs.feeRateSatPerVbyte {
             return false
         }
         return true
@@ -3434,7 +3434,7 @@ extension PrepareRefundRequest: Equatable, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(swapAddress)
         hasher.combine(refundAddress)
-        hasher.combine(feeRateMsatPerVbyte)
+        hasher.combine(feeRateSatPerVbyte)
     }
 }
 
@@ -3444,14 +3444,14 @@ public struct FfiConverterTypePrepareRefundRequest: FfiConverterRustBuffer {
         return try PrepareRefundRequest(
             swapAddress: FfiConverterString.read(from: &buf), 
             refundAddress: FfiConverterString.read(from: &buf), 
-            feeRateMsatPerVbyte: FfiConverterUInt32.read(from: &buf)
+            feeRateSatPerVbyte: FfiConverterUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: PrepareRefundRequest, into buf: inout [UInt8]) {
         FfiConverterString.write(value.swapAddress, into: &buf)
         FfiConverterString.write(value.refundAddress, into: &buf)
-        FfiConverterUInt32.write(value.feeRateMsatPerVbyte, into: &buf)
+        FfiConverterUInt32.write(value.feeRateSatPerVbyte, into: &buf)
     }
 }
 
@@ -3885,14 +3885,14 @@ public func FfiConverterTypeRecommendedFees_lower(_ value: RecommendedFees) -> R
 public struct RefundRequest {
     public var swapAddress: String
     public var refundAddress: String
-    public var feeRateMsatPerVbyte: UInt32
+    public var feeRateSatPerVbyte: UInt32
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(swapAddress: String, refundAddress: String, feeRateMsatPerVbyte: UInt32) {
+    public init(swapAddress: String, refundAddress: String, feeRateSatPerVbyte: UInt32) {
         self.swapAddress = swapAddress
         self.refundAddress = refundAddress
-        self.feeRateMsatPerVbyte = feeRateMsatPerVbyte
+        self.feeRateSatPerVbyte = feeRateSatPerVbyte
     }
 }
 
@@ -3905,7 +3905,7 @@ extension RefundRequest: Equatable, Hashable {
         if lhs.refundAddress != rhs.refundAddress {
             return false
         }
-        if lhs.feeRateMsatPerVbyte != rhs.feeRateMsatPerVbyte {
+        if lhs.feeRateSatPerVbyte != rhs.feeRateSatPerVbyte {
             return false
         }
         return true
@@ -3914,7 +3914,7 @@ extension RefundRequest: Equatable, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(swapAddress)
         hasher.combine(refundAddress)
-        hasher.combine(feeRateMsatPerVbyte)
+        hasher.combine(feeRateSatPerVbyte)
     }
 }
 
@@ -3924,14 +3924,14 @@ public struct FfiConverterTypeRefundRequest: FfiConverterRustBuffer {
         return try RefundRequest(
             swapAddress: FfiConverterString.read(from: &buf), 
             refundAddress: FfiConverterString.read(from: &buf), 
-            feeRateMsatPerVbyte: FfiConverterUInt32.read(from: &buf)
+            feeRateSatPerVbyte: FfiConverterUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: RefundRequest, into buf: inout [UInt8]) {
         FfiConverterString.write(value.swapAddress, into: &buf)
         FfiConverterString.write(value.refundAddress, into: &buf)
-        FfiConverterUInt32.write(value.feeRateMsatPerVbyte, into: &buf)
+        FfiConverterUInt32.write(value.feeRateSatPerVbyte, into: &buf)
     }
 }
 
