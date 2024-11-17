@@ -3419,12 +3419,12 @@ public func FfiConverterTypePrepareLnUrlPayResponse_lower(_ value: PrepareLnUrlP
 
 
 public struct PreparePayOnchainRequest {
-    public var amount: PayOnchainAmount
+    public var amount: PayAmount
     public var feeRateSatPerVbyte: UInt32?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(amount: PayOnchainAmount, feeRateSatPerVbyte: UInt32? = nil) {
+    public init(amount: PayAmount, feeRateSatPerVbyte: UInt32? = nil) {
         self.amount = amount
         self.feeRateSatPerVbyte = feeRateSatPerVbyte
     }
@@ -3452,13 +3452,13 @@ extension PreparePayOnchainRequest: Equatable, Hashable {
 public struct FfiConverterTypePreparePayOnchainRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PreparePayOnchainRequest {
         return try PreparePayOnchainRequest(
-            amount: FfiConverterTypePayOnchainAmount.read(from: &buf), 
+            amount: FfiConverterTypePayAmount.read(from: &buf), 
             feeRateSatPerVbyte: FfiConverterOptionUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: PreparePayOnchainRequest, into buf: inout [UInt8]) {
-        FfiConverterTypePayOnchainAmount.write(value.amount, into: &buf)
+        FfiConverterTypePayAmount.write(value.amount, into: &buf)
         FfiConverterOptionUInt32.write(value.feeRateSatPerVbyte, into: &buf)
     }
 }
@@ -3782,13 +3782,13 @@ public func FfiConverterTypePrepareRefundResponse_lower(_ value: PrepareRefundRe
 
 public struct PrepareSendRequest {
     public var destination: String
-    public var amountSat: UInt64?
+    public var amount: PayAmount?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(destination: String, amountSat: UInt64? = nil) {
+    public init(destination: String, amount: PayAmount? = nil) {
         self.destination = destination
-        self.amountSat = amountSat
+        self.amount = amount
     }
 }
 
@@ -3798,7 +3798,7 @@ extension PrepareSendRequest: Equatable, Hashable {
         if lhs.destination != rhs.destination {
             return false
         }
-        if lhs.amountSat != rhs.amountSat {
+        if lhs.amount != rhs.amount {
             return false
         }
         return true
@@ -3806,7 +3806,7 @@ extension PrepareSendRequest: Equatable, Hashable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(destination)
-        hasher.combine(amountSat)
+        hasher.combine(amount)
     }
 }
 
@@ -3815,13 +3815,13 @@ public struct FfiConverterTypePrepareSendRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PrepareSendRequest {
         return try PrepareSendRequest(
             destination: FfiConverterString.read(from: &buf), 
-            amountSat: FfiConverterOptionUInt64.read(from: &buf)
+            amount: FfiConverterOptionTypePayAmount.read(from: &buf)
         )
     }
 
     public static func write(_ value: PrepareSendRequest, into buf: inout [UInt8]) {
         FfiConverterString.write(value.destination, into: &buf)
-        FfiConverterOptionUInt64.write(value.amountSat, into: &buf)
+        FfiConverterOptionTypePayAmount.write(value.amount, into: &buf)
     }
 }
 
@@ -5774,16 +5774,16 @@ extension Network: Equatable, Hashable {}
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
-public enum PayOnchainAmount {
+public enum PayAmount {
     
     case receiver(amountSat: UInt64)
     case drain
 }
 
-public struct FfiConverterTypePayOnchainAmount: FfiConverterRustBuffer {
-    typealias SwiftType = PayOnchainAmount
+public struct FfiConverterTypePayAmount: FfiConverterRustBuffer {
+    typealias SwiftType = PayAmount
 
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PayOnchainAmount {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PayAmount {
         let variant: Int32 = try readInt(&buf)
         switch variant {
         
@@ -5797,7 +5797,7 @@ public struct FfiConverterTypePayOnchainAmount: FfiConverterRustBuffer {
         }
     }
 
-    public static func write(_ value: PayOnchainAmount, into buf: inout [UInt8]) {
+    public static func write(_ value: PayAmount, into buf: inout [UInt8]) {
         switch value {
         
         
@@ -5814,16 +5814,16 @@ public struct FfiConverterTypePayOnchainAmount: FfiConverterRustBuffer {
 }
 
 
-public func FfiConverterTypePayOnchainAmount_lift(_ buf: RustBuffer) throws -> PayOnchainAmount {
-    return try FfiConverterTypePayOnchainAmount.lift(buf)
+public func FfiConverterTypePayAmount_lift(_ buf: RustBuffer) throws -> PayAmount {
+    return try FfiConverterTypePayAmount.lift(buf)
 }
 
-public func FfiConverterTypePayOnchainAmount_lower(_ value: PayOnchainAmount) -> RustBuffer {
-    return FfiConverterTypePayOnchainAmount.lower(value)
+public func FfiConverterTypePayAmount_lower(_ value: PayAmount) -> RustBuffer {
+    return FfiConverterTypePayAmount.lower(value)
 }
 
 
-extension PayOnchainAmount: Equatable, Hashable {}
+extension PayAmount: Equatable, Hashable {}
 
 
 
@@ -7496,6 +7496,27 @@ fileprivate struct FfiConverterOptionTypeListPaymentDetails: FfiConverterRustBuf
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterTypeListPaymentDetails.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+fileprivate struct FfiConverterOptionTypePayAmount: FfiConverterRustBuffer {
+    typealias SwiftType = PayAmount?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypePayAmount.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypePayAmount.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
