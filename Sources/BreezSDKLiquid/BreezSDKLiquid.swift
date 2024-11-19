@@ -1298,11 +1298,12 @@ public struct Config {
     public var paymentTimeoutSec: UInt64
     public var zeroConfMinFeeRateMsat: UInt32
     public var breezApiKey: String?
+    public var cacheDir: String?
     public var zeroConfMaxAmountSat: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(liquidElectrumUrl: String, bitcoinElectrumUrl: String, mempoolspaceUrl: String, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, zeroConfMinFeeRateMsat: UInt32, breezApiKey: String?, zeroConfMaxAmountSat: UInt64?) {
+    public init(liquidElectrumUrl: String, bitcoinElectrumUrl: String, mempoolspaceUrl: String, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, zeroConfMinFeeRateMsat: UInt32, breezApiKey: String?, cacheDir: String?, zeroConfMaxAmountSat: UInt64?) {
         self.liquidElectrumUrl = liquidElectrumUrl
         self.bitcoinElectrumUrl = bitcoinElectrumUrl
         self.mempoolspaceUrl = mempoolspaceUrl
@@ -1311,6 +1312,7 @@ public struct Config {
         self.paymentTimeoutSec = paymentTimeoutSec
         self.zeroConfMinFeeRateMsat = zeroConfMinFeeRateMsat
         self.breezApiKey = breezApiKey
+        self.cacheDir = cacheDir
         self.zeroConfMaxAmountSat = zeroConfMaxAmountSat
     }
 }
@@ -1342,6 +1344,9 @@ extension Config: Equatable, Hashable {
         if lhs.breezApiKey != rhs.breezApiKey {
             return false
         }
+        if lhs.cacheDir != rhs.cacheDir {
+            return false
+        }
         if lhs.zeroConfMaxAmountSat != rhs.zeroConfMaxAmountSat {
             return false
         }
@@ -1357,6 +1362,7 @@ extension Config: Equatable, Hashable {
         hasher.combine(paymentTimeoutSec)
         hasher.combine(zeroConfMinFeeRateMsat)
         hasher.combine(breezApiKey)
+        hasher.combine(cacheDir)
         hasher.combine(zeroConfMaxAmountSat)
     }
 }
@@ -1373,6 +1379,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
             paymentTimeoutSec: FfiConverterUInt64.read(from: &buf), 
             zeroConfMinFeeRateMsat: FfiConverterUInt32.read(from: &buf), 
             breezApiKey: FfiConverterOptionString.read(from: &buf), 
+            cacheDir: FfiConverterOptionString.read(from: &buf), 
             zeroConfMaxAmountSat: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
@@ -1386,6 +1393,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
         FfiConverterUInt64.write(value.paymentTimeoutSec, into: &buf)
         FfiConverterUInt32.write(value.zeroConfMinFeeRateMsat, into: &buf)
         FfiConverterOptionString.write(value.breezApiKey, into: &buf)
+        FfiConverterOptionString.write(value.cacheDir, into: &buf)
         FfiConverterOptionUInt64.write(value.zeroConfMaxAmountSat, into: &buf)
     }
 }
@@ -1866,6 +1874,109 @@ public func FfiConverterTypeLNInvoice_lower(_ value: LnInvoice) -> RustBuffer {
 }
 
 
+public struct LnOffer {
+    public var offer: String
+    public var chains: [String]
+    public var paths: [LnOfferBlindedPath]
+    public var description: String?
+    public var signingPubkey: String?
+    public var minAmount: Amount?
+    public var absoluteExpiry: UInt64?
+    public var issuer: String?
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(offer: String, chains: [String], paths: [LnOfferBlindedPath], description: String?, signingPubkey: String?, minAmount: Amount?, absoluteExpiry: UInt64?, issuer: String?) {
+        self.offer = offer
+        self.chains = chains
+        self.paths = paths
+        self.description = description
+        self.signingPubkey = signingPubkey
+        self.minAmount = minAmount
+        self.absoluteExpiry = absoluteExpiry
+        self.issuer = issuer
+    }
+}
+
+
+extension LnOffer: Equatable, Hashable {
+    public static func ==(lhs: LnOffer, rhs: LnOffer) -> Bool {
+        if lhs.offer != rhs.offer {
+            return false
+        }
+        if lhs.chains != rhs.chains {
+            return false
+        }
+        if lhs.paths != rhs.paths {
+            return false
+        }
+        if lhs.description != rhs.description {
+            return false
+        }
+        if lhs.signingPubkey != rhs.signingPubkey {
+            return false
+        }
+        if lhs.minAmount != rhs.minAmount {
+            return false
+        }
+        if lhs.absoluteExpiry != rhs.absoluteExpiry {
+            return false
+        }
+        if lhs.issuer != rhs.issuer {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(offer)
+        hasher.combine(chains)
+        hasher.combine(paths)
+        hasher.combine(description)
+        hasher.combine(signingPubkey)
+        hasher.combine(minAmount)
+        hasher.combine(absoluteExpiry)
+        hasher.combine(issuer)
+    }
+}
+
+
+public struct FfiConverterTypeLNOffer: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LnOffer {
+        return try LnOffer(
+            offer: FfiConverterString.read(from: &buf), 
+            chains: FfiConverterSequenceString.read(from: &buf), 
+            paths: FfiConverterSequenceTypeLnOfferBlindedPath.read(from: &buf), 
+            description: FfiConverterOptionString.read(from: &buf), 
+            signingPubkey: FfiConverterOptionString.read(from: &buf), 
+            minAmount: FfiConverterOptionTypeAmount.read(from: &buf), 
+            absoluteExpiry: FfiConverterOptionUInt64.read(from: &buf), 
+            issuer: FfiConverterOptionString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: LnOffer, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.offer, into: &buf)
+        FfiConverterSequenceString.write(value.chains, into: &buf)
+        FfiConverterSequenceTypeLnOfferBlindedPath.write(value.paths, into: &buf)
+        FfiConverterOptionString.write(value.description, into: &buf)
+        FfiConverterOptionString.write(value.signingPubkey, into: &buf)
+        FfiConverterOptionTypeAmount.write(value.minAmount, into: &buf)
+        FfiConverterOptionUInt64.write(value.absoluteExpiry, into: &buf)
+        FfiConverterOptionString.write(value.issuer, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeLNOffer_lift(_ buf: RustBuffer) throws -> LnOffer {
+    return try FfiConverterTypeLNOffer.lift(buf)
+}
+
+public func FfiConverterTypeLNOffer_lower(_ value: LnOffer) -> RustBuffer {
+    return FfiConverterTypeLNOffer.lower(value)
+}
+
+
 public struct LightningPaymentLimitsResponse {
     public var send: Limits
     public var receive: Limits
@@ -2155,6 +2266,53 @@ public func FfiConverterTypeListPaymentsRequest_lift(_ buf: RustBuffer) throws -
 
 public func FfiConverterTypeListPaymentsRequest_lower(_ value: ListPaymentsRequest) -> RustBuffer {
     return FfiConverterTypeListPaymentsRequest.lower(value)
+}
+
+
+public struct LnOfferBlindedPath {
+    public var blindedHops: [String]
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(blindedHops: [String]) {
+        self.blindedHops = blindedHops
+    }
+}
+
+
+extension LnOfferBlindedPath: Equatable, Hashable {
+    public static func ==(lhs: LnOfferBlindedPath, rhs: LnOfferBlindedPath) -> Bool {
+        if lhs.blindedHops != rhs.blindedHops {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(blindedHops)
+    }
+}
+
+
+public struct FfiConverterTypeLnOfferBlindedPath: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> LnOfferBlindedPath {
+        return try LnOfferBlindedPath(
+            blindedHops: FfiConverterSequenceString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: LnOfferBlindedPath, into buf: inout [UInt8]) {
+        FfiConverterSequenceString.write(value.blindedHops, into: &buf)
+    }
+}
+
+
+public func FfiConverterTypeLnOfferBlindedPath_lift(_ buf: RustBuffer) throws -> LnOfferBlindedPath {
+    return try FfiConverterTypeLnOfferBlindedPath.lift(buf)
+}
+
+public func FfiConverterTypeLnOfferBlindedPath_lower(_ value: LnOfferBlindedPath) -> RustBuffer {
+    return FfiConverterTypeLnOfferBlindedPath.lower(value)
 }
 
 
@@ -4877,6 +5035,66 @@ extension AesSuccessActionDataResult: Equatable, Hashable {}
 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+public enum Amount {
+    
+    case bitcoin(amountMsat: UInt64)
+    case currency(iso4217Code: String, fractionalAmount: UInt64)
+}
+
+public struct FfiConverterTypeAmount: FfiConverterRustBuffer {
+    typealias SwiftType = Amount
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Amount {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .bitcoin(
+            amountMsat: try FfiConverterUInt64.read(from: &buf)
+        )
+        
+        case 2: return .currency(
+            iso4217Code: try FfiConverterString.read(from: &buf), 
+            fractionalAmount: try FfiConverterUInt64.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: Amount, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .bitcoin(amountMsat):
+            writeInt(&buf, Int32(1))
+            FfiConverterUInt64.write(amountMsat, into: &buf)
+            
+        
+        case let .currency(iso4217Code,fractionalAmount):
+            writeInt(&buf, Int32(2))
+            FfiConverterString.write(iso4217Code, into: &buf)
+            FfiConverterUInt64.write(fractionalAmount, into: &buf)
+            
+        }
+    }
+}
+
+
+public func FfiConverterTypeAmount_lift(_ buf: RustBuffer) throws -> Amount {
+    return try FfiConverterTypeAmount.lift(buf)
+}
+
+public func FfiConverterTypeAmount_lower(_ value: Amount) -> RustBuffer {
+    return FfiConverterTypeAmount.lower(value)
+}
+
+
+extension Amount: Equatable, Hashable {}
+
+
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum BuyBitcoinProvider {
     
     case moonpay
@@ -4975,6 +5193,7 @@ public enum InputType {
     case bitcoinAddress(address: BitcoinAddressData)
     case liquidAddress(address: LiquidAddressData)
     case bolt11(invoice: LnInvoice)
+    case bolt12Offer(offer: LnOffer)
     case nodeId(nodeId: String)
     case url(url: String)
     case lnUrlPay(data: LnUrlPayRequestData)
@@ -5002,27 +5221,31 @@ public struct FfiConverterTypeInputType: FfiConverterRustBuffer {
             invoice: try FfiConverterTypeLNInvoice.read(from: &buf)
         )
         
-        case 4: return .nodeId(
+        case 4: return .bolt12Offer(
+            offer: try FfiConverterTypeLNOffer.read(from: &buf)
+        )
+        
+        case 5: return .nodeId(
             nodeId: try FfiConverterString.read(from: &buf)
         )
         
-        case 5: return .url(
+        case 6: return .url(
             url: try FfiConverterString.read(from: &buf)
         )
         
-        case 6: return .lnUrlPay(
+        case 7: return .lnUrlPay(
             data: try FfiConverterTypeLnUrlPayRequestData.read(from: &buf)
         )
         
-        case 7: return .lnUrlWithdraw(
+        case 8: return .lnUrlWithdraw(
             data: try FfiConverterTypeLnUrlWithdrawRequestData.read(from: &buf)
         )
         
-        case 8: return .lnUrlAuth(
+        case 9: return .lnUrlAuth(
             data: try FfiConverterTypeLnUrlAuthRequestData.read(from: &buf)
         )
         
-        case 9: return .lnUrlError(
+        case 10: return .lnUrlError(
             data: try FfiConverterTypeLnUrlErrorData.read(from: &buf)
         )
         
@@ -5049,33 +5272,38 @@ public struct FfiConverterTypeInputType: FfiConverterRustBuffer {
             FfiConverterTypeLNInvoice.write(invoice, into: &buf)
             
         
-        case let .nodeId(nodeId):
+        case let .bolt12Offer(offer):
             writeInt(&buf, Int32(4))
+            FfiConverterTypeLNOffer.write(offer, into: &buf)
+            
+        
+        case let .nodeId(nodeId):
+            writeInt(&buf, Int32(5))
             FfiConverterString.write(nodeId, into: &buf)
             
         
         case let .url(url):
-            writeInt(&buf, Int32(5))
+            writeInt(&buf, Int32(6))
             FfiConverterString.write(url, into: &buf)
             
         
         case let .lnUrlPay(data):
-            writeInt(&buf, Int32(6))
+            writeInt(&buf, Int32(7))
             FfiConverterTypeLnUrlPayRequestData.write(data, into: &buf)
             
         
         case let .lnUrlWithdraw(data):
-            writeInt(&buf, Int32(7))
+            writeInt(&buf, Int32(8))
             FfiConverterTypeLnUrlWithdrawRequestData.write(data, into: &buf)
             
         
         case let .lnUrlAuth(data):
-            writeInt(&buf, Int32(8))
+            writeInt(&buf, Int32(9))
             FfiConverterTypeLnUrlAuthRequestData.write(data, into: &buf)
             
         
         case let .lnUrlError(data):
-            writeInt(&buf, Int32(9))
+            writeInt(&buf, Int32(10))
             FfiConverterTypeLnUrlErrorData.write(data, into: &buf)
             
         }
@@ -5831,7 +6059,7 @@ extension PayAmount: Equatable, Hashable {}
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum PaymentDetails {
     
-    case lightning(swapId: String, description: String, preimage: String?, bolt11: String?, paymentHash: String?, refundTxId: String?, refundTxAmountSat: UInt64?)
+    case lightning(swapId: String, description: String, preimage: String?, bolt11: String?, bolt12Offer: String?, paymentHash: String?, refundTxId: String?, refundTxAmountSat: UInt64?)
     case liquid(destination: String, description: String)
     case bitcoin(swapId: String, description: String, refundTxId: String?, refundTxAmountSat: UInt64?)
 }
@@ -5848,6 +6076,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             description: try FfiConverterString.read(from: &buf), 
             preimage: try FfiConverterOptionString.read(from: &buf), 
             bolt11: try FfiConverterOptionString.read(from: &buf), 
+            bolt12Offer: try FfiConverterOptionString.read(from: &buf), 
             paymentHash: try FfiConverterOptionString.read(from: &buf), 
             refundTxId: try FfiConverterOptionString.read(from: &buf), 
             refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
@@ -5873,12 +6102,13 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         switch value {
         
         
-        case let .lightning(swapId,description,preimage,bolt11,paymentHash,refundTxId,refundTxAmountSat):
+        case let .lightning(swapId,description,preimage,bolt11,bolt12Offer,paymentHash,refundTxId,refundTxAmountSat):
             writeInt(&buf, Int32(1))
             FfiConverterString.write(swapId, into: &buf)
             FfiConverterString.write(description, into: &buf)
             FfiConverterOptionString.write(preimage, into: &buf)
             FfiConverterOptionString.write(bolt11, into: &buf)
+            FfiConverterOptionString.write(bolt12Offer, into: &buf)
             FfiConverterOptionString.write(paymentHash, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
             FfiConverterOptionUInt64.write(refundTxAmountSat, into: &buf)
@@ -6535,6 +6765,7 @@ public enum SendDestination {
     
     case liquidAddress(addressData: LiquidAddressData)
     case bolt11(invoice: LnInvoice)
+    case bolt12(offer: LnOffer, receiverAmountSat: UInt64)
 }
 
 public struct FfiConverterTypeSendDestination: FfiConverterRustBuffer {
@@ -6550,6 +6781,11 @@ public struct FfiConverterTypeSendDestination: FfiConverterRustBuffer {
         
         case 2: return .bolt11(
             invoice: try FfiConverterTypeLNInvoice.read(from: &buf)
+        )
+        
+        case 3: return .bolt12(
+            offer: try FfiConverterTypeLNOffer.read(from: &buf), 
+            receiverAmountSat: try FfiConverterUInt64.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -6568,6 +6804,12 @@ public struct FfiConverterTypeSendDestination: FfiConverterRustBuffer {
         case let .bolt11(invoice):
             writeInt(&buf, Int32(2))
             FfiConverterTypeLNInvoice.write(invoice, into: &buf)
+            
+        
+        case let .bolt12(offer,receiverAmountSat):
+            writeInt(&buf, Int32(3))
+            FfiConverterTypeLNOffer.write(offer, into: &buf)
+            FfiConverterUInt64.write(receiverAmountSat, into: &buf)
             
         }
     }
@@ -7480,6 +7722,27 @@ fileprivate struct FfiConverterOptionTypeSymbol: FfiConverterRustBuffer {
     }
 }
 
+fileprivate struct FfiConverterOptionTypeAmount: FfiConverterRustBuffer {
+    typealias SwiftType = Amount?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterTypeAmount.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterTypeAmount.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
 fileprivate struct FfiConverterOptionTypeListPaymentDetails: FfiConverterRustBuffer {
     typealias SwiftType = ListPaymentDetails?
 
@@ -7607,6 +7870,28 @@ fileprivate struct FfiConverterSequenceUInt8: FfiConverterRustBuffer {
     }
 }
 
+fileprivate struct FfiConverterSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]
+
+    public static func write(_ value: [String], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterString.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [String]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterString.read(from: &buf))
+        }
+        return seq
+    }
+}
+
 fileprivate struct FfiConverterSequenceTypeFiatCurrency: FfiConverterRustBuffer {
     typealias SwiftType = [FiatCurrency]
 
@@ -7624,6 +7909,28 @@ fileprivate struct FfiConverterSequenceTypeFiatCurrency: FfiConverterRustBuffer 
         seq.reserveCapacity(Int(len))
         for _ in 0 ..< len {
             seq.append(try FfiConverterTypeFiatCurrency.read(from: &buf))
+        }
+        return seq
+    }
+}
+
+fileprivate struct FfiConverterSequenceTypeLnOfferBlindedPath: FfiConverterRustBuffer {
+    typealias SwiftType = [LnOfferBlindedPath]
+
+    public static func write(_ value: [LnOfferBlindedPath], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterTypeLnOfferBlindedPath.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [LnOfferBlindedPath] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [LnOfferBlindedPath]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            seq.append(try FfiConverterTypeLnOfferBlindedPath.read(from: &buf))
         }
         return seq
     }
