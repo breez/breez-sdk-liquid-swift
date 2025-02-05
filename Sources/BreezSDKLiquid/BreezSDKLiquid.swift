@@ -5958,7 +5958,8 @@ extension BuyBitcoinProvider: Equatable, Hashable {}
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum GetPaymentRequest {
     
-    case lightning(paymentHash: String)
+    case paymentHash(paymentHash: String)
+    case swapId(swapId: String)
 }
 
 public struct FfiConverterTypeGetPaymentRequest: FfiConverterRustBuffer {
@@ -5968,8 +5969,12 @@ public struct FfiConverterTypeGetPaymentRequest: FfiConverterRustBuffer {
         let variant: Int32 = try readInt(&buf)
         switch variant {
         
-        case 1: return .lightning(
+        case 1: return .paymentHash(
             paymentHash: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 2: return .swapId(
+            swapId: try FfiConverterString.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -5980,9 +5985,14 @@ public struct FfiConverterTypeGetPaymentRequest: FfiConverterRustBuffer {
         switch value {
         
         
-        case let .lightning(paymentHash):
+        case let .paymentHash(paymentHash):
             writeInt(&buf, Int32(1))
             FfiConverterString.write(paymentHash, into: &buf)
+            
+        
+        case let .swapId(swapId):
+            writeInt(&buf, Int32(2))
+            FfiConverterString.write(swapId, into: &buf)
             
         }
     }
@@ -6889,9 +6899,9 @@ extension PayAmount: Equatable, Hashable {}
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 public enum PaymentDetails {
     
-    case lightning(swapId: String, description: String, liquidExpirationBlockheight: UInt32, preimage: String?, invoice: String?, bolt12Offer: String?, paymentHash: String?, destinationPubkey: String?, lnurlInfo: LnUrlInfo?, refundTxId: String?, refundTxAmountSat: UInt64?)
+    case lightning(swapId: String, description: String, liquidExpirationBlockheight: UInt32, preimage: String?, invoice: String?, bolt12Offer: String?, paymentHash: String?, destinationPubkey: String?, lnurlInfo: LnUrlInfo?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?)
     case liquid(assetId: String, destination: String, description: String, assetInfo: AssetInfo?)
-    case bitcoin(swapId: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32?, liquidExpirationBlockheight: UInt32?, refundTxId: String?, refundTxAmountSat: UInt64?)
+    case bitcoin(swapId: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32?, liquidExpirationBlockheight: UInt32?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?)
 }
 
 public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
@@ -6911,6 +6921,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             paymentHash: try FfiConverterOptionString.read(from: &buf), 
             destinationPubkey: try FfiConverterOptionString.read(from: &buf), 
             lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), 
+            claimTxId: try FfiConverterOptionString.read(from: &buf), 
             refundTxId: try FfiConverterOptionString.read(from: &buf), 
             refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
         )
@@ -6928,6 +6939,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             autoAcceptedFees: try FfiConverterBool.read(from: &buf), 
             bitcoinExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), 
             liquidExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), 
+            claimTxId: try FfiConverterOptionString.read(from: &buf), 
             refundTxId: try FfiConverterOptionString.read(from: &buf), 
             refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
         )
@@ -6940,7 +6952,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         switch value {
         
         
-        case let .lightning(swapId,description,liquidExpirationBlockheight,preimage,invoice,bolt12Offer,paymentHash,destinationPubkey,lnurlInfo,refundTxId,refundTxAmountSat):
+        case let .lightning(swapId,description,liquidExpirationBlockheight,preimage,invoice,bolt12Offer,paymentHash,destinationPubkey,lnurlInfo,claimTxId,refundTxId,refundTxAmountSat):
             writeInt(&buf, Int32(1))
             FfiConverterString.write(swapId, into: &buf)
             FfiConverterString.write(description, into: &buf)
@@ -6951,6 +6963,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             FfiConverterOptionString.write(paymentHash, into: &buf)
             FfiConverterOptionString.write(destinationPubkey, into: &buf)
             FfiConverterOptionTypeLnUrlInfo.write(lnurlInfo, into: &buf)
+            FfiConverterOptionString.write(claimTxId, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
             FfiConverterOptionUInt64.write(refundTxAmountSat, into: &buf)
             
@@ -6963,13 +6976,14 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             FfiConverterOptionTypeAssetInfo.write(assetInfo, into: &buf)
             
         
-        case let .bitcoin(swapId,description,autoAcceptedFees,bitcoinExpirationBlockheight,liquidExpirationBlockheight,refundTxId,refundTxAmountSat):
+        case let .bitcoin(swapId,description,autoAcceptedFees,bitcoinExpirationBlockheight,liquidExpirationBlockheight,claimTxId,refundTxId,refundTxAmountSat):
             writeInt(&buf, Int32(3))
             FfiConverterString.write(swapId, into: &buf)
             FfiConverterString.write(description, into: &buf)
             FfiConverterBool.write(autoAcceptedFees, into: &buf)
             FfiConverterOptionUInt32.write(bitcoinExpirationBlockheight, into: &buf)
             FfiConverterOptionUInt32.write(liquidExpirationBlockheight, into: &buf)
+            FfiConverterOptionString.write(claimTxId, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
             FfiConverterOptionUInt64.write(refundTxAmountSat, into: &buf)
             
