@@ -1800,12 +1800,14 @@ public func FfiConverterTypeConfig_lower(_ value: Config) -> RustBuffer {
 public struct ConnectRequest {
     public var config: Config
     public var mnemonic: String
+    public var passphrase: String?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(config: Config, mnemonic: String) {
+    public init(config: Config, mnemonic: String, passphrase: String? = nil) {
         self.config = config
         self.mnemonic = mnemonic
+        self.passphrase = passphrase
     }
 }
 
@@ -1818,12 +1820,16 @@ extension ConnectRequest: Equatable, Hashable {
         if lhs.mnemonic != rhs.mnemonic {
             return false
         }
+        if lhs.passphrase != rhs.passphrase {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(config)
         hasher.combine(mnemonic)
+        hasher.combine(passphrase)
     }
 }
 
@@ -1832,13 +1838,15 @@ public struct FfiConverterTypeConnectRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ConnectRequest {
         return try ConnectRequest(
             config: FfiConverterTypeConfig.read(from: &buf), 
-            mnemonic: FfiConverterString.read(from: &buf)
+            mnemonic: FfiConverterString.read(from: &buf), 
+            passphrase: FfiConverterOptionString.read(from: &buf)
         )
     }
 
     public static func write(_ value: ConnectRequest, into buf: inout [UInt8]) {
         FfiConverterTypeConfig.write(value.config, into: &buf)
         FfiConverterString.write(value.mnemonic, into: &buf)
+        FfiConverterOptionString.write(value.passphrase, into: &buf)
     }
 }
 
