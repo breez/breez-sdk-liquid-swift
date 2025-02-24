@@ -1791,15 +1791,17 @@ public func FfiConverterTypeConfig_lower(_ value: Config) -> RustBuffer {
 
 public struct ConnectRequest {
     public var config: Config
-    public var mnemonic: String
+    public var mnemonic: String?
     public var passphrase: String?
+    public var seed: [UInt8]?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(config: Config, mnemonic: String, passphrase: String? = nil) {
+    public init(config: Config, mnemonic: String? = nil, passphrase: String? = nil, seed: [UInt8]? = nil) {
         self.config = config
         self.mnemonic = mnemonic
         self.passphrase = passphrase
+        self.seed = seed
     }
 }
 
@@ -1815,6 +1817,9 @@ extension ConnectRequest: Equatable, Hashable {
         if lhs.passphrase != rhs.passphrase {
             return false
         }
+        if lhs.seed != rhs.seed {
+            return false
+        }
         return true
     }
 
@@ -1822,6 +1827,7 @@ extension ConnectRequest: Equatable, Hashable {
         hasher.combine(config)
         hasher.combine(mnemonic)
         hasher.combine(passphrase)
+        hasher.combine(seed)
     }
 }
 
@@ -1830,15 +1836,17 @@ public struct FfiConverterTypeConnectRequest: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ConnectRequest {
         return try ConnectRequest(
             config: FfiConverterTypeConfig.read(from: &buf), 
-            mnemonic: FfiConverterString.read(from: &buf), 
-            passphrase: FfiConverterOptionString.read(from: &buf)
+            mnemonic: FfiConverterOptionString.read(from: &buf), 
+            passphrase: FfiConverterOptionString.read(from: &buf), 
+            seed: FfiConverterOptionSequenceUInt8.read(from: &buf)
         )
     }
 
     public static func write(_ value: ConnectRequest, into buf: inout [UInt8]) {
         FfiConverterTypeConfig.write(value.config, into: &buf)
-        FfiConverterString.write(value.mnemonic, into: &buf)
+        FfiConverterOptionString.write(value.mnemonic, into: &buf)
         FfiConverterOptionString.write(value.passphrase, into: &buf)
+        FfiConverterOptionSequenceUInt8.write(value.seed, into: &buf)
     }
 }
 
@@ -8955,6 +8963,27 @@ fileprivate struct FfiConverterOptionTypeSuccessActionProcessed: FfiConverterRus
         switch try readInt(&buf) as Int8 {
         case 0: return nil
         case 1: return try FfiConverterTypeSuccessActionProcessed.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
+fileprivate struct FfiConverterOptionSequenceUInt8: FfiConverterRustBuffer {
+    typealias SwiftType = [UInt8]?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterSequenceUInt8.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterSequenceUInt8.read(from: &buf)
         default: throw UniffiInternalError.unexpectedOptionalTag
         }
     }
