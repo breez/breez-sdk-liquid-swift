@@ -572,6 +572,8 @@ public protocol BindingLiquidSdkProtocol : AnyObject {
     
     func checkMessage(req: CheckMessageRequest) throws  -> CheckMessageResponse
     
+    func createBolt12Invoice(req: CreateBolt12InvoiceRequest) throws  -> CreateBolt12InvoiceResponse
+    
     func disconnect() throws 
     
     func fetchFiatRates() throws  -> [Rate]
@@ -722,6 +724,14 @@ open func checkMessage(req: CheckMessageRequest)throws  -> CheckMessageResponse 
     return try  FfiConverterTypeCheckMessageResponse.lift(try rustCallWithError(FfiConverterTypeSdkError.lift) {
     uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_check_message(self.uniffiClonePointer(),
         FfiConverterTypeCheckMessageRequest.lower(req),$0
+    )
+})
+}
+    
+open func createBolt12Invoice(req: CreateBolt12InvoiceRequest)throws  -> CreateBolt12InvoiceResponse {
+    return try  FfiConverterTypeCreateBolt12InvoiceResponse.lift(try rustCallWithError(FfiConverterTypePaymentError.lift) {
+    uniffi_breez_sdk_liquid_bindings_fn_method_bindingliquidsdk_create_bolt12_invoice(self.uniffiClonePointer(),
+        FfiConverterTypeCreateBolt12InvoiceRequest.lower(req),$0
     )
 })
 }
@@ -2190,6 +2200,130 @@ public func FfiConverterTypeConnectWithSignerRequest_lift(_ buf: RustBuffer) thr
 #endif
 public func FfiConverterTypeConnectWithSignerRequest_lower(_ value: ConnectWithSignerRequest) -> RustBuffer {
     return FfiConverterTypeConnectWithSignerRequest.lower(value)
+}
+
+
+public struct CreateBolt12InvoiceRequest {
+    public var offer: String
+    public var invoiceRequest: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(offer: String, invoiceRequest: String) {
+        self.offer = offer
+        self.invoiceRequest = invoiceRequest
+    }
+}
+
+
+
+extension CreateBolt12InvoiceRequest: Equatable, Hashable {
+    public static func ==(lhs: CreateBolt12InvoiceRequest, rhs: CreateBolt12InvoiceRequest) -> Bool {
+        if lhs.offer != rhs.offer {
+            return false
+        }
+        if lhs.invoiceRequest != rhs.invoiceRequest {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(offer)
+        hasher.combine(invoiceRequest)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeCreateBolt12InvoiceRequest: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> CreateBolt12InvoiceRequest {
+        return
+            try CreateBolt12InvoiceRequest(
+                offer: FfiConverterString.read(from: &buf), 
+                invoiceRequest: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: CreateBolt12InvoiceRequest, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.offer, into: &buf)
+        FfiConverterString.write(value.invoiceRequest, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeCreateBolt12InvoiceRequest_lift(_ buf: RustBuffer) throws -> CreateBolt12InvoiceRequest {
+    return try FfiConverterTypeCreateBolt12InvoiceRequest.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeCreateBolt12InvoiceRequest_lower(_ value: CreateBolt12InvoiceRequest) -> RustBuffer {
+    return FfiConverterTypeCreateBolt12InvoiceRequest.lower(value)
+}
+
+
+public struct CreateBolt12InvoiceResponse {
+    public var invoice: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(invoice: String) {
+        self.invoice = invoice
+    }
+}
+
+
+
+extension CreateBolt12InvoiceResponse: Equatable, Hashable {
+    public static func ==(lhs: CreateBolt12InvoiceResponse, rhs: CreateBolt12InvoiceResponse) -> Bool {
+        if lhs.invoice != rhs.invoice {
+            return false
+        }
+        return true
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(invoice)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeCreateBolt12InvoiceResponse: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> CreateBolt12InvoiceResponse {
+        return
+            try CreateBolt12InvoiceResponse(
+                invoice: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: CreateBolt12InvoiceResponse, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.invoice, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeCreateBolt12InvoiceResponse_lift(_ buf: RustBuffer) throws -> CreateBolt12InvoiceResponse {
+    return try FfiConverterTypeCreateBolt12InvoiceResponse.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeCreateBolt12InvoiceResponse_lower(_ value: CreateBolt12InvoiceResponse) -> RustBuffer {
+    return FfiConverterTypeCreateBolt12InvoiceResponse.lower(value)
 }
 
 
@@ -4866,15 +5000,17 @@ public struct PrepareLnUrlPayResponse {
     public var destination: SendDestination
     public var feesSat: UInt64
     public var data: LnUrlPayRequestData
+    public var amount: PayAmount
     public var comment: String?
     public var successAction: SuccessAction?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(destination: SendDestination, feesSat: UInt64, data: LnUrlPayRequestData, comment: String? = nil, successAction: SuccessAction? = nil) {
+    public init(destination: SendDestination, feesSat: UInt64, data: LnUrlPayRequestData, amount: PayAmount, comment: String? = nil, successAction: SuccessAction? = nil) {
         self.destination = destination
         self.feesSat = feesSat
         self.data = data
+        self.amount = amount
         self.comment = comment
         self.successAction = successAction
     }
@@ -4893,6 +5029,9 @@ extension PrepareLnUrlPayResponse: Equatable, Hashable {
         if lhs.data != rhs.data {
             return false
         }
+        if lhs.amount != rhs.amount {
+            return false
+        }
         if lhs.comment != rhs.comment {
             return false
         }
@@ -4906,6 +5045,7 @@ extension PrepareLnUrlPayResponse: Equatable, Hashable {
         hasher.combine(destination)
         hasher.combine(feesSat)
         hasher.combine(data)
+        hasher.combine(amount)
         hasher.combine(comment)
         hasher.combine(successAction)
     }
@@ -4922,6 +5062,7 @@ public struct FfiConverterTypePrepareLnUrlPayResponse: FfiConverterRustBuffer {
                 destination: FfiConverterTypeSendDestination.read(from: &buf), 
                 feesSat: FfiConverterUInt64.read(from: &buf), 
                 data: FfiConverterTypeLnUrlPayRequestData.read(from: &buf), 
+                amount: FfiConverterTypePayAmount.read(from: &buf), 
                 comment: FfiConverterOptionString.read(from: &buf), 
                 successAction: FfiConverterOptionTypeSuccessAction.read(from: &buf)
         )
@@ -4931,6 +5072,7 @@ public struct FfiConverterTypePrepareLnUrlPayResponse: FfiConverterRustBuffer {
         FfiConverterTypeSendDestination.write(value.destination, into: &buf)
         FfiConverterUInt64.write(value.feesSat, into: &buf)
         FfiConverterTypeLnUrlPayRequestData.write(value.data, into: &buf)
+        FfiConverterTypePayAmount.write(value.amount, into: &buf)
         FfiConverterOptionString.write(value.comment, into: &buf)
         FfiConverterOptionTypeSuccessAction.write(value.successAction, into: &buf)
     }
@@ -5472,13 +5614,15 @@ public func FfiConverterTypePrepareSendRequest_lower(_ value: PrepareSendRequest
 
 public struct PrepareSendResponse {
     public var destination: SendDestination
+    public var amount: PayAmount?
     public var feesSat: UInt64?
     public var estimatedAssetFees: Double?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(destination: SendDestination, feesSat: UInt64?, estimatedAssetFees: Double?) {
+    public init(destination: SendDestination, amount: PayAmount?, feesSat: UInt64?, estimatedAssetFees: Double?) {
         self.destination = destination
+        self.amount = amount
         self.feesSat = feesSat
         self.estimatedAssetFees = estimatedAssetFees
     }
@@ -5489,6 +5633,9 @@ public struct PrepareSendResponse {
 extension PrepareSendResponse: Equatable, Hashable {
     public static func ==(lhs: PrepareSendResponse, rhs: PrepareSendResponse) -> Bool {
         if lhs.destination != rhs.destination {
+            return false
+        }
+        if lhs.amount != rhs.amount {
             return false
         }
         if lhs.feesSat != rhs.feesSat {
@@ -5502,6 +5649,7 @@ extension PrepareSendResponse: Equatable, Hashable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(destination)
+        hasher.combine(amount)
         hasher.combine(feesSat)
         hasher.combine(estimatedAssetFees)
     }
@@ -5516,6 +5664,7 @@ public struct FfiConverterTypePrepareSendResponse: FfiConverterRustBuffer {
         return
             try PrepareSendResponse(
                 destination: FfiConverterTypeSendDestination.read(from: &buf), 
+                amount: FfiConverterOptionTypePayAmount.read(from: &buf), 
                 feesSat: FfiConverterOptionUInt64.read(from: &buf), 
                 estimatedAssetFees: FfiConverterOptionDouble.read(from: &buf)
         )
@@ -5523,6 +5672,7 @@ public struct FfiConverterTypePrepareSendResponse: FfiConverterRustBuffer {
 
     public static func write(_ value: PrepareSendResponse, into buf: inout [UInt8]) {
         FfiConverterTypeSendDestination.write(value.destination, into: &buf)
+        FfiConverterOptionTypePayAmount.write(value.amount, into: &buf)
         FfiConverterOptionUInt64.write(value.feesSat, into: &buf)
         FfiConverterOptionDouble.write(value.estimatedAssetFees, into: &buf)
     }
@@ -7544,6 +7694,8 @@ public enum LnUrlPayError {
     case AlreadyPaid
     case Generic(err: String
     )
+    case InsufficientBalance(err: String
+    )
     case InvalidAmount(err: String
     )
     case InvalidInvoice(err: String
@@ -7584,34 +7736,37 @@ public struct FfiConverterTypeLnUrlPayError: FfiConverterRustBuffer {
         case 2: return .Generic(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 3: return .InvalidAmount(
+        case 3: return .InsufficientBalance(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 4: return .InvalidInvoice(
+        case 4: return .InvalidAmount(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 5: return .InvalidNetwork(
+        case 5: return .InvalidInvoice(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 6: return .InvalidUri(
+        case 6: return .InvalidNetwork(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 7: return .InvoiceExpired(
+        case 7: return .InvalidUri(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 8: return .PaymentFailed(
+        case 8: return .InvoiceExpired(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 9: return .PaymentTimeout(
+        case 9: return .PaymentFailed(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 10: return .RouteNotFound(
+        case 10: return .PaymentTimeout(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 11: return .RouteTooExpensive(
+        case 11: return .RouteNotFound(
             err: try FfiConverterString.read(from: &buf)
             )
-        case 12: return .ServiceConnectivity(
+        case 12: return .RouteTooExpensive(
+            err: try FfiConverterString.read(from: &buf)
+            )
+        case 13: return .ServiceConnectivity(
             err: try FfiConverterString.read(from: &buf)
             )
 
@@ -7635,53 +7790,58 @@ public struct FfiConverterTypeLnUrlPayError: FfiConverterRustBuffer {
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .InvalidAmount(err):
+        case let .InsufficientBalance(err):
             writeInt(&buf, Int32(3))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .InvalidInvoice(err):
+        case let .InvalidAmount(err):
             writeInt(&buf, Int32(4))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .InvalidNetwork(err):
+        case let .InvalidInvoice(err):
             writeInt(&buf, Int32(5))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .InvalidUri(err):
+        case let .InvalidNetwork(err):
             writeInt(&buf, Int32(6))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .InvoiceExpired(err):
+        case let .InvalidUri(err):
             writeInt(&buf, Int32(7))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .PaymentFailed(err):
+        case let .InvoiceExpired(err):
             writeInt(&buf, Int32(8))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .PaymentTimeout(err):
+        case let .PaymentFailed(err):
             writeInt(&buf, Int32(9))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .RouteNotFound(err):
+        case let .PaymentTimeout(err):
             writeInt(&buf, Int32(10))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .RouteTooExpensive(err):
+        case let .RouteNotFound(err):
             writeInt(&buf, Int32(11))
             FfiConverterString.write(err, into: &buf)
             
         
-        case let .ServiceConnectivity(err):
+        case let .RouteTooExpensive(err):
             writeInt(&buf, Int32(12))
+            FfiConverterString.write(err, into: &buf)
+            
+        
+        case let .ServiceConnectivity(err):
+            writeInt(&buf, Int32(13))
             FfiConverterString.write(err, into: &buf)
             
         }
@@ -8132,7 +8292,7 @@ public enum PaymentDetails {
     )
     case liquid(assetId: String, destination: String, description: String, assetInfo: AssetInfo?, lnurlInfo: LnUrlInfo?, bip353Address: String?
     )
-    case bitcoin(swapId: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32?, liquidExpirationBlockheight: UInt32?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?
+    case bitcoin(swapId: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32?, liquidExpirationBlockheight: UInt32?, lockupTxId: String?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?
     )
 }
 
@@ -8153,7 +8313,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         case 2: return .liquid(assetId: try FfiConverterString.read(from: &buf), destination: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), assetInfo: try FfiConverterOptionTypeAssetInfo.read(from: &buf), lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), bip353Address: try FfiConverterOptionString.read(from: &buf)
         )
         
-        case 3: return .bitcoin(swapId: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), autoAcceptedFees: try FfiConverterBool.read(from: &buf), bitcoinExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), liquidExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
+        case 3: return .bitcoin(swapId: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), autoAcceptedFees: try FfiConverterBool.read(from: &buf), bitcoinExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), liquidExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), lockupTxId: try FfiConverterOptionString.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -8191,13 +8351,14 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             FfiConverterOptionString.write(bip353Address, into: &buf)
             
         
-        case let .bitcoin(swapId,description,autoAcceptedFees,bitcoinExpirationBlockheight,liquidExpirationBlockheight,claimTxId,refundTxId,refundTxAmountSat):
+        case let .bitcoin(swapId,description,autoAcceptedFees,bitcoinExpirationBlockheight,liquidExpirationBlockheight,lockupTxId,claimTxId,refundTxId,refundTxAmountSat):
             writeInt(&buf, Int32(3))
             FfiConverterString.write(swapId, into: &buf)
             FfiConverterString.write(description, into: &buf)
             FfiConverterBool.write(autoAcceptedFees, into: &buf)
             FfiConverterOptionUInt32.write(bitcoinExpirationBlockheight, into: &buf)
             FfiConverterOptionUInt32.write(liquidExpirationBlockheight, into: &buf)
+            FfiConverterOptionString.write(lockupTxId, into: &buf)
             FfiConverterOptionString.write(claimTxId, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
             FfiConverterOptionUInt64.write(refundTxAmountSat, into: &buf)
@@ -8448,6 +8609,8 @@ extension PaymentError: Foundation.LocalizedError {
 public enum PaymentMethod {
     
     case lightning
+    case bolt11Invoice
+    case bolt12Offer
     case bitcoinAddress
     case liquidAddress
 }
@@ -8465,9 +8628,13 @@ public struct FfiConverterTypePaymentMethod: FfiConverterRustBuffer {
         
         case 1: return .lightning
         
-        case 2: return .bitcoinAddress
+        case 2: return .bolt11Invoice
         
-        case 3: return .liquidAddress
+        case 3: return .bolt12Offer
+        
+        case 4: return .bitcoinAddress
+        
+        case 5: return .liquidAddress
         
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -8481,12 +8648,20 @@ public struct FfiConverterTypePaymentMethod: FfiConverterRustBuffer {
             writeInt(&buf, Int32(1))
         
         
-        case .bitcoinAddress:
+        case .bolt11Invoice:
             writeInt(&buf, Int32(2))
         
         
-        case .liquidAddress:
+        case .bolt12Offer:
             writeInt(&buf, Int32(3))
+        
+        
+        case .bitcoinAddress:
+            writeInt(&buf, Int32(4))
+        
+        
+        case .liquidAddress:
+            writeInt(&buf, Int32(5))
         
         }
     }
@@ -10758,6 +10933,9 @@ private var initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_check_message() != 64029) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_create_bolt12_invoice() != 30488) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_breez_sdk_liquid_bindings_checksum_method_bindingliquidsdk_disconnect() != 37717) {

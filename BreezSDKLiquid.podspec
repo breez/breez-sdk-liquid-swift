@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name                   = "BreezSDKLiquid"
-  spec.version                = "0.8.3"
+  spec.version                = "0.9.0"
   spec.license                = { :type => "MIT" }
   spec.summary                = "Swift bindings to the Breez Liquid SDK"
   spec.homepage               = "https://breez.technology"
