@@ -7,11 +7,13 @@ struct LnurlVerifyRequest: Codable {
 }
 
 struct LnurlVerifyResponse: Decodable, Encodable {
+    let status: String
     let settled: Bool
     let preimage: String?
     let pr: String
     
     init(settled: Bool, preimage: String?, pr: String) {
+        self.status = "OK"
         self.settled = settled
         self.preimage = preimage
         self.pr = pr
@@ -45,7 +47,7 @@ class LnurlPayVerifyTask : LnurlPayTask {
             }
             var response: LnurlVerifyResponse? = nil
             switch payment.details {
-                case let .lightning(_, _, _, preimage, invoice, _, _, _, _, _, claimTxId, _, _):
+                case let .lightning(_, _, _, preimage, invoice, _, _, _, _, _, _, claimTxId, _, _):
                     // In the case of a Lightning payment, if it's paid via Lightning or MRH,
                     // we can release the preimage
                     let settled = switch payment.status {
@@ -64,7 +66,7 @@ class LnurlPayVerifyTask : LnurlPayTask {
             if response == nil {
                 throw InvalidLnurlPayError.notFound
             }
-            let maxAge = response!.settled ? Constants.CACHE_CONTROL_MAX_AGE_WEEK : 0
+            let maxAge = response!.settled ? Constants.CACHE_CONTROL_MAX_AGE_WEEK : Constants.CACHE_CONTROL_MAX_AGE_THREE_SEC
             replyServer(encodable: response, replyURL: request!.reply_url, maxAge: maxAge)
         } catch let e {
             self.logger.log(tag: TAG, line: "failed to process lnurl verify: \(e)", level: "ERROR")
