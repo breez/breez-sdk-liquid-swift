@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "BreezSDKLiquid", targets: ["breez_sdk_liquidFFI", "BreezSDKLiquid"]),
     ],
     targets: [
-        .binaryTarget(name: "breez_sdk_liquidFFI", url: "https://github.com/breez/breez-sdk-liquid-swift/releases/download/0.10.1/breez_sdk_liquidFFI.xcframework.zip", checksum: "3f0c0b07be3582efbd84574ec97acef2a7b78d897971e2161602bc9205a2f534"),
+        .binaryTarget(name: "breez_sdk_liquidFFI", url: "https://github.com/breez/breez-sdk-liquid-swift/releases/download/0.10.2/breez_sdk_liquidFFI.xcframework.zip", checksum: "35f6f1dfa0bbbb4fbf17ae59de61487905251aa6c6e9ed36d9518399ca271977"),
         .target(name: "BreezSDKLiquid", dependencies: ["breez_sdk_liquidFFI"]),
     ]
 )
