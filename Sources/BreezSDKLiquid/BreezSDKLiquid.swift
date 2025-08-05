@@ -1911,6 +1911,7 @@ public struct Config {
     public var breezApiKey: String?
     public var zeroConfMaxAmountSat: UInt64?
     public var useDefaultExternalInputParsers: Bool
+    public var useMagicRoutingHints: Bool
     public var externalInputParsers: [ExternalInputParser]?
     public var onchainFeeRateLeewaySat: UInt64?
     public var assetMetadata: [AssetMetadata]?
@@ -1918,7 +1919,7 @@ public struct Config {
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(liquidExplorer: BlockchainExplorer, bitcoinExplorer: BlockchainExplorer, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, syncServiceUrl: String?, breezApiKey: String?, zeroConfMaxAmountSat: UInt64?, useDefaultExternalInputParsers: Bool = true, externalInputParsers: [ExternalInputParser]? = nil, onchainFeeRateLeewaySat: UInt64? = nil, assetMetadata: [AssetMetadata]? = nil, sideswapApiKey: String? = nil) {
+    public init(liquidExplorer: BlockchainExplorer, bitcoinExplorer: BlockchainExplorer, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, syncServiceUrl: String?, breezApiKey: String?, zeroConfMaxAmountSat: UInt64?, useDefaultExternalInputParsers: Bool = true, useMagicRoutingHints: Bool = true, externalInputParsers: [ExternalInputParser]? = nil, onchainFeeRateLeewaySat: UInt64? = nil, assetMetadata: [AssetMetadata]? = nil, sideswapApiKey: String? = nil) {
         self.liquidExplorer = liquidExplorer
         self.bitcoinExplorer = bitcoinExplorer
         self.workingDir = workingDir
@@ -1928,6 +1929,7 @@ public struct Config {
         self.breezApiKey = breezApiKey
         self.zeroConfMaxAmountSat = zeroConfMaxAmountSat
         self.useDefaultExternalInputParsers = useDefaultExternalInputParsers
+        self.useMagicRoutingHints = useMagicRoutingHints
         self.externalInputParsers = externalInputParsers
         self.onchainFeeRateLeewaySat = onchainFeeRateLeewaySat
         self.assetMetadata = assetMetadata
@@ -1966,6 +1968,9 @@ extension Config: Equatable, Hashable {
         if lhs.useDefaultExternalInputParsers != rhs.useDefaultExternalInputParsers {
             return false
         }
+        if lhs.useMagicRoutingHints != rhs.useMagicRoutingHints {
+            return false
+        }
         if lhs.externalInputParsers != rhs.externalInputParsers {
             return false
         }
@@ -1991,6 +1996,7 @@ extension Config: Equatable, Hashable {
         hasher.combine(breezApiKey)
         hasher.combine(zeroConfMaxAmountSat)
         hasher.combine(useDefaultExternalInputParsers)
+        hasher.combine(useMagicRoutingHints)
         hasher.combine(externalInputParsers)
         hasher.combine(onchainFeeRateLeewaySat)
         hasher.combine(assetMetadata)
@@ -2015,6 +2021,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
                 breezApiKey: FfiConverterOptionString.read(from: &buf), 
                 zeroConfMaxAmountSat: FfiConverterOptionUInt64.read(from: &buf), 
                 useDefaultExternalInputParsers: FfiConverterBool.read(from: &buf), 
+                useMagicRoutingHints: FfiConverterBool.read(from: &buf), 
                 externalInputParsers: FfiConverterOptionSequenceTypeExternalInputParser.read(from: &buf), 
                 onchainFeeRateLeewaySat: FfiConverterOptionUInt64.read(from: &buf), 
                 assetMetadata: FfiConverterOptionSequenceTypeAssetMetadata.read(from: &buf), 
@@ -2032,6 +2039,7 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
         FfiConverterOptionString.write(value.breezApiKey, into: &buf)
         FfiConverterOptionUInt64.write(value.zeroConfMaxAmountSat, into: &buf)
         FfiConverterBool.write(value.useDefaultExternalInputParsers, into: &buf)
+        FfiConverterBool.write(value.useMagicRoutingHints, into: &buf)
         FfiConverterOptionSequenceTypeExternalInputParser.write(value.externalInputParsers, into: &buf)
         FfiConverterOptionUInt64.write(value.onchainFeeRateLeewaySat, into: &buf)
         FfiConverterOptionSequenceTypeAssetMetadata.write(value.assetMetadata, into: &buf)
@@ -5609,14 +5617,16 @@ public struct PrepareSendResponse {
     public var amount: PayAmount?
     public var feesSat: UInt64?
     public var estimatedAssetFees: Double?
+    public var exchangeAmountSat: UInt64?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(destination: SendDestination, amount: PayAmount?, feesSat: UInt64?, estimatedAssetFees: Double?) {
+    public init(destination: SendDestination, amount: PayAmount?, feesSat: UInt64?, estimatedAssetFees: Double?, exchangeAmountSat: UInt64?) {
         self.destination = destination
         self.amount = amount
         self.feesSat = feesSat
         self.estimatedAssetFees = estimatedAssetFees
+        self.exchangeAmountSat = exchangeAmountSat
     }
 }
 
@@ -5636,6 +5646,9 @@ extension PrepareSendResponse: Equatable, Hashable {
         if lhs.estimatedAssetFees != rhs.estimatedAssetFees {
             return false
         }
+        if lhs.exchangeAmountSat != rhs.exchangeAmountSat {
+            return false
+        }
         return true
     }
 
@@ -5644,6 +5657,7 @@ extension PrepareSendResponse: Equatable, Hashable {
         hasher.combine(amount)
         hasher.combine(feesSat)
         hasher.combine(estimatedAssetFees)
+        hasher.combine(exchangeAmountSat)
     }
 }
 
@@ -5658,7 +5672,8 @@ public struct FfiConverterTypePrepareSendResponse: FfiConverterRustBuffer {
                 destination: FfiConverterTypeSendDestination.read(from: &buf), 
                 amount: FfiConverterOptionTypePayAmount.read(from: &buf), 
                 feesSat: FfiConverterOptionUInt64.read(from: &buf), 
-                estimatedAssetFees: FfiConverterOptionDouble.read(from: &buf)
+                estimatedAssetFees: FfiConverterOptionDouble.read(from: &buf), 
+                exchangeAmountSat: FfiConverterOptionUInt64.read(from: &buf)
         )
     }
 
@@ -5667,6 +5682,7 @@ public struct FfiConverterTypePrepareSendResponse: FfiConverterRustBuffer {
         FfiConverterOptionTypePayAmount.write(value.amount, into: &buf)
         FfiConverterOptionUInt64.write(value.feesSat, into: &buf)
         FfiConverterOptionDouble.write(value.estimatedAssetFees, into: &buf)
+        FfiConverterOptionUInt64.write(value.exchangeAmountSat, into: &buf)
     }
 }
 
@@ -8219,7 +8235,7 @@ public enum PayAmount {
     
     case bitcoin(receiverAmountSat: UInt64
     )
-    case asset(assetId: String, receiverAmount: Double, estimateAssetFees: Bool?
+    case asset(assetId: String, receiverAmount: Double, estimateAssetFees: Bool?, payWithBitcoin: Bool?
     )
     case drain
 }
@@ -8238,7 +8254,7 @@ public struct FfiConverterTypePayAmount: FfiConverterRustBuffer {
         case 1: return .bitcoin(receiverAmountSat: try FfiConverterUInt64.read(from: &buf)
         )
         
-        case 2: return .asset(assetId: try FfiConverterString.read(from: &buf), receiverAmount: try FfiConverterDouble.read(from: &buf), estimateAssetFees: try FfiConverterOptionBool.read(from: &buf)
+        case 2: return .asset(assetId: try FfiConverterString.read(from: &buf), receiverAmount: try FfiConverterDouble.read(from: &buf), estimateAssetFees: try FfiConverterOptionBool.read(from: &buf), payWithBitcoin: try FfiConverterOptionBool.read(from: &buf)
         )
         
         case 3: return .drain
@@ -8256,11 +8272,12 @@ public struct FfiConverterTypePayAmount: FfiConverterRustBuffer {
             FfiConverterUInt64.write(receiverAmountSat, into: &buf)
             
         
-        case let .asset(assetId,receiverAmount,estimateAssetFees):
+        case let .asset(assetId,receiverAmount,estimateAssetFees,payWithBitcoin):
             writeInt(&buf, Int32(2))
             FfiConverterString.write(assetId, into: &buf)
             FfiConverterDouble.write(receiverAmount, into: &buf)
             FfiConverterOptionBool.write(estimateAssetFees, into: &buf)
+            FfiConverterOptionBool.write(payWithBitcoin, into: &buf)
             
         
         case .drain:
