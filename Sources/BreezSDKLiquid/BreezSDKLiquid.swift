@@ -8235,7 +8235,7 @@ public enum PayAmount {
     
     case bitcoin(receiverAmountSat: UInt64
     )
-    case asset(assetId: String, receiverAmount: Double, estimateAssetFees: Bool?, payWithBitcoin: Bool?
+    case asset(toAsset: String, receiverAmount: Double, estimateAssetFees: Bool?, fromAsset: String?
     )
     case drain
 }
@@ -8254,7 +8254,7 @@ public struct FfiConverterTypePayAmount: FfiConverterRustBuffer {
         case 1: return .bitcoin(receiverAmountSat: try FfiConverterUInt64.read(from: &buf)
         )
         
-        case 2: return .asset(assetId: try FfiConverterString.read(from: &buf), receiverAmount: try FfiConverterDouble.read(from: &buf), estimateAssetFees: try FfiConverterOptionBool.read(from: &buf), payWithBitcoin: try FfiConverterOptionBool.read(from: &buf)
+        case 2: return .asset(toAsset: try FfiConverterString.read(from: &buf), receiverAmount: try FfiConverterDouble.read(from: &buf), estimateAssetFees: try FfiConverterOptionBool.read(from: &buf), fromAsset: try FfiConverterOptionString.read(from: &buf)
         )
         
         case 3: return .drain
@@ -8272,12 +8272,12 @@ public struct FfiConverterTypePayAmount: FfiConverterRustBuffer {
             FfiConverterUInt64.write(receiverAmountSat, into: &buf)
             
         
-        case let .asset(assetId,receiverAmount,estimateAssetFees,payWithBitcoin):
+        case let .asset(toAsset,receiverAmount,estimateAssetFees,fromAsset):
             writeInt(&buf, Int32(2))
-            FfiConverterString.write(assetId, into: &buf)
+            FfiConverterString.write(toAsset, into: &buf)
             FfiConverterDouble.write(receiverAmount, into: &buf)
             FfiConverterOptionBool.write(estimateAssetFees, into: &buf)
-            FfiConverterOptionBool.write(payWithBitcoin, into: &buf)
+            FfiConverterOptionString.write(fromAsset, into: &buf)
             
         
         case .drain:
