@@ -5852,11 +5852,15 @@ public func FfiConverterTypeReceivePaymentRequest_lower(_ value: ReceivePaymentR
 
 public struct ReceivePaymentResponse {
     public var destination: String
+    public var liquidExpirationBlockheight: UInt32?
+    public var bitcoinExpirationBlockheight: UInt32?
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(destination: String) {
+    public init(destination: String, liquidExpirationBlockheight: UInt32?, bitcoinExpirationBlockheight: UInt32?) {
         self.destination = destination
+        self.liquidExpirationBlockheight = liquidExpirationBlockheight
+        self.bitcoinExpirationBlockheight = bitcoinExpirationBlockheight
     }
 }
 
@@ -5867,11 +5871,19 @@ extension ReceivePaymentResponse: Equatable, Hashable {
         if lhs.destination != rhs.destination {
             return false
         }
+        if lhs.liquidExpirationBlockheight != rhs.liquidExpirationBlockheight {
+            return false
+        }
+        if lhs.bitcoinExpirationBlockheight != rhs.bitcoinExpirationBlockheight {
+            return false
+        }
         return true
     }
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(destination)
+        hasher.combine(liquidExpirationBlockheight)
+        hasher.combine(bitcoinExpirationBlockheight)
     }
 }
 
@@ -5883,12 +5895,16 @@ public struct FfiConverterTypeReceivePaymentResponse: FfiConverterRustBuffer {
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> ReceivePaymentResponse {
         return
             try ReceivePaymentResponse(
-                destination: FfiConverterString.read(from: &buf)
+                destination: FfiConverterString.read(from: &buf), 
+                liquidExpirationBlockheight: FfiConverterOptionUInt32.read(from: &buf), 
+                bitcoinExpirationBlockheight: FfiConverterOptionUInt32.read(from: &buf)
         )
     }
 
     public static func write(_ value: ReceivePaymentResponse, into buf: inout [UInt8]) {
         FfiConverterString.write(value.destination, into: &buf)
+        FfiConverterOptionUInt32.write(value.liquidExpirationBlockheight, into: &buf)
+        FfiConverterOptionUInt32.write(value.bitcoinExpirationBlockheight, into: &buf)
     }
 }
 
@@ -8317,7 +8333,7 @@ public enum PaymentDetails {
     )
     case liquid(assetId: String, destination: String, description: String, assetInfo: AssetInfo?, lnurlInfo: LnUrlInfo?, bip353Address: String?, payerNote: String?
     )
-    case bitcoin(swapId: String, bitcoinAddress: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32?, liquidExpirationBlockheight: UInt32?, lockupTxId: String?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?
+    case bitcoin(swapId: String, bitcoinAddress: String, description: String, autoAcceptedFees: Bool, bitcoinExpirationBlockheight: UInt32, liquidExpirationBlockheight: UInt32, lockupTxId: String?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?
     )
 }
 
@@ -8338,7 +8354,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         case 2: return .liquid(assetId: try FfiConverterString.read(from: &buf), destination: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), assetInfo: try FfiConverterOptionTypeAssetInfo.read(from: &buf), lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), bip353Address: try FfiConverterOptionString.read(from: &buf), payerNote: try FfiConverterOptionString.read(from: &buf)
         )
         
-        case 3: return .bitcoin(swapId: try FfiConverterString.read(from: &buf), bitcoinAddress: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), autoAcceptedFees: try FfiConverterBool.read(from: &buf), bitcoinExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), liquidExpirationBlockheight: try FfiConverterOptionUInt32.read(from: &buf), lockupTxId: try FfiConverterOptionString.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
+        case 3: return .bitcoin(swapId: try FfiConverterString.read(from: &buf), bitcoinAddress: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), autoAcceptedFees: try FfiConverterBool.read(from: &buf), bitcoinExpirationBlockheight: try FfiConverterUInt32.read(from: &buf), liquidExpirationBlockheight: try FfiConverterUInt32.read(from: &buf), lockupTxId: try FfiConverterOptionString.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -8384,8 +8400,8 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             FfiConverterString.write(bitcoinAddress, into: &buf)
             FfiConverterString.write(description, into: &buf)
             FfiConverterBool.write(autoAcceptedFees, into: &buf)
-            FfiConverterOptionUInt32.write(bitcoinExpirationBlockheight, into: &buf)
-            FfiConverterOptionUInt32.write(liquidExpirationBlockheight, into: &buf)
+            FfiConverterUInt32.write(bitcoinExpirationBlockheight, into: &buf)
+            FfiConverterUInt32.write(liquidExpirationBlockheight, into: &buf)
             FfiConverterOptionString.write(lockupTxId, into: &buf)
             FfiConverterOptionString.write(claimTxId, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
