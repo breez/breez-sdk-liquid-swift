@@ -9077,6 +9077,8 @@ public enum SdkEvent {
     case paymentWaitingFeeAcceptance(details: Payment
     )
     case synced
+    case syncFailed(error: String
+    )
     case dataSynced(didPullNewRecords: Bool
     )
 }
@@ -9118,7 +9120,10 @@ public struct FfiConverterTypeSdkEvent: FfiConverterRustBuffer {
         
         case 9: return .synced
         
-        case 10: return .dataSynced(didPullNewRecords: try FfiConverterBool.read(from: &buf)
+        case 10: return .syncFailed(error: try FfiConverterString.read(from: &buf)
+        )
+        
+        case 11: return .dataSynced(didPullNewRecords: try FfiConverterBool.read(from: &buf)
         )
         
         default: throw UniffiInternalError.unexpectedEnumCase
@@ -9173,8 +9178,13 @@ public struct FfiConverterTypeSdkEvent: FfiConverterRustBuffer {
             writeInt(&buf, Int32(9))
         
         
-        case let .dataSynced(didPullNewRecords):
+        case let .syncFailed(error):
             writeInt(&buf, Int32(10))
+            FfiConverterString.write(error, into: &buf)
+            
+        
+        case let .dataSynced(didPullNewRecords):
+            writeInt(&buf, Int32(11))
             FfiConverterBool.write(didPullNewRecords, into: &buf)
             
         }
