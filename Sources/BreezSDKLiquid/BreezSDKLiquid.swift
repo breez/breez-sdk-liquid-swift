@@ -1916,10 +1916,12 @@ public struct Config {
     public var onchainFeeRateLeewaySat: UInt64?
     public var assetMetadata: [AssetMetadata]?
     public var sideswapApiKey: String?
+    public var onchainSyncPeriodSec: UInt32
+    public var onchainSyncRequestTimeoutSec: UInt32
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(liquidExplorer: BlockchainExplorer, bitcoinExplorer: BlockchainExplorer, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, syncServiceUrl: String?, breezApiKey: String?, zeroConfMaxAmountSat: UInt64?, useDefaultExternalInputParsers: Bool = true, useMagicRoutingHints: Bool = true, externalInputParsers: [ExternalInputParser]? = nil, onchainFeeRateLeewaySat: UInt64? = nil, assetMetadata: [AssetMetadata]? = nil, sideswapApiKey: String? = nil) {
+    public init(liquidExplorer: BlockchainExplorer, bitcoinExplorer: BlockchainExplorer, workingDir: String, network: LiquidNetwork, paymentTimeoutSec: UInt64, syncServiceUrl: String?, breezApiKey: String?, zeroConfMaxAmountSat: UInt64?, useDefaultExternalInputParsers: Bool = true, useMagicRoutingHints: Bool = true, externalInputParsers: [ExternalInputParser]? = nil, onchainFeeRateLeewaySat: UInt64? = nil, assetMetadata: [AssetMetadata]? = nil, sideswapApiKey: String? = nil, onchainSyncPeriodSec: UInt32, onchainSyncRequestTimeoutSec: UInt32) {
         self.liquidExplorer = liquidExplorer
         self.bitcoinExplorer = bitcoinExplorer
         self.workingDir = workingDir
@@ -1934,6 +1936,8 @@ public struct Config {
         self.onchainFeeRateLeewaySat = onchainFeeRateLeewaySat
         self.assetMetadata = assetMetadata
         self.sideswapApiKey = sideswapApiKey
+        self.onchainSyncPeriodSec = onchainSyncPeriodSec
+        self.onchainSyncRequestTimeoutSec = onchainSyncRequestTimeoutSec
     }
 }
 
@@ -1983,6 +1987,12 @@ extension Config: Equatable, Hashable {
         if lhs.sideswapApiKey != rhs.sideswapApiKey {
             return false
         }
+        if lhs.onchainSyncPeriodSec != rhs.onchainSyncPeriodSec {
+            return false
+        }
+        if lhs.onchainSyncRequestTimeoutSec != rhs.onchainSyncRequestTimeoutSec {
+            return false
+        }
         return true
     }
 
@@ -2001,6 +2011,8 @@ extension Config: Equatable, Hashable {
         hasher.combine(onchainFeeRateLeewaySat)
         hasher.combine(assetMetadata)
         hasher.combine(sideswapApiKey)
+        hasher.combine(onchainSyncPeriodSec)
+        hasher.combine(onchainSyncRequestTimeoutSec)
     }
 }
 
@@ -2025,7 +2037,9 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
                 externalInputParsers: FfiConverterOptionSequenceTypeExternalInputParser.read(from: &buf), 
                 onchainFeeRateLeewaySat: FfiConverterOptionUInt64.read(from: &buf), 
                 assetMetadata: FfiConverterOptionSequenceTypeAssetMetadata.read(from: &buf), 
-                sideswapApiKey: FfiConverterOptionString.read(from: &buf)
+                sideswapApiKey: FfiConverterOptionString.read(from: &buf), 
+                onchainSyncPeriodSec: FfiConverterUInt32.read(from: &buf), 
+                onchainSyncRequestTimeoutSec: FfiConverterUInt32.read(from: &buf)
         )
     }
 
@@ -2044,6 +2058,8 @@ public struct FfiConverterTypeConfig: FfiConverterRustBuffer {
         FfiConverterOptionUInt64.write(value.onchainFeeRateLeewaySat, into: &buf)
         FfiConverterOptionSequenceTypeAssetMetadata.write(value.assetMetadata, into: &buf)
         FfiConverterOptionString.write(value.sideswapApiKey, into: &buf)
+        FfiConverterUInt32.write(value.onchainSyncPeriodSec, into: &buf)
+        FfiConverterUInt32.write(value.onchainSyncRequestTimeoutSec, into: &buf)
     }
 }
 
