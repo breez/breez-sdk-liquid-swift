@@ -9485,6 +9485,7 @@ public enum NwcError {
     case MaxBudgetExceeded
     case ConnectionNotFound
     case ConnectionExists
+    case PaymentInProgress
 }
 
 
@@ -9526,6 +9527,7 @@ public struct FfiConverterTypeNwcError: FfiConverterRustBuffer {
         case 11: return .MaxBudgetExceeded
         case 12: return .ConnectionNotFound
         case 13: return .ConnectionExists
+        case 14: return .PaymentInProgress
 
          default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -9594,6 +9596,10 @@ public struct FfiConverterTypeNwcError: FfiConverterRustBuffer {
         
         case .ConnectionExists:
             writeInt(&buf, Int32(13))
+        
+        
+        case .PaymentInProgress:
+            writeInt(&buf, Int32(14))
         
         }
     }
@@ -9822,7 +9828,7 @@ extension PayAmount: Equatable, Hashable {}
 
 public enum PaymentDetails {
     
-    case lightning(swapId: String, description: String, liquidExpirationBlockheight: UInt32, preimage: String?, invoice: String?, bolt12Offer: String?, paymentHash: String?, destinationPubkey: String?, lnurlInfo: LnUrlInfo?, bip353Address: String?, payerNote: String?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?
+    case lightning(swapId: String, description: String, liquidExpirationBlockheight: UInt32, preimage: String?, invoice: String?, bolt12Offer: String?, paymentHash: String?, destinationPubkey: String?, lnurlInfo: LnUrlInfo?, bip353Address: String?, payerNote: String?, claimTxId: String?, refundTxId: String?, refundTxAmountSat: UInt64?, settledAt: UInt32?
     )
     case liquid(assetId: String, destination: String, description: String, assetInfo: AssetInfo?, lnurlInfo: LnUrlInfo?, bip353Address: String?, payerNote: String?
     )
@@ -9841,7 +9847,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         let variant: Int32 = try readInt(&buf)
         switch variant {
         
-        case 1: return .lightning(swapId: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), liquidExpirationBlockheight: try FfiConverterUInt32.read(from: &buf), preimage: try FfiConverterOptionString.read(from: &buf), invoice: try FfiConverterOptionString.read(from: &buf), bolt12Offer: try FfiConverterOptionString.read(from: &buf), paymentHash: try FfiConverterOptionString.read(from: &buf), destinationPubkey: try FfiConverterOptionString.read(from: &buf), lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), bip353Address: try FfiConverterOptionString.read(from: &buf), payerNote: try FfiConverterOptionString.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf)
+        case 1: return .lightning(swapId: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), liquidExpirationBlockheight: try FfiConverterUInt32.read(from: &buf), preimage: try FfiConverterOptionString.read(from: &buf), invoice: try FfiConverterOptionString.read(from: &buf), bolt12Offer: try FfiConverterOptionString.read(from: &buf), paymentHash: try FfiConverterOptionString.read(from: &buf), destinationPubkey: try FfiConverterOptionString.read(from: &buf), lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), bip353Address: try FfiConverterOptionString.read(from: &buf), payerNote: try FfiConverterOptionString.read(from: &buf), claimTxId: try FfiConverterOptionString.read(from: &buf), refundTxId: try FfiConverterOptionString.read(from: &buf), refundTxAmountSat: try FfiConverterOptionUInt64.read(from: &buf), settledAt: try FfiConverterOptionUInt32.read(from: &buf)
         )
         
         case 2: return .liquid(assetId: try FfiConverterString.read(from: &buf), destination: try FfiConverterString.read(from: &buf), description: try FfiConverterString.read(from: &buf), assetInfo: try FfiConverterOptionTypeAssetInfo.read(from: &buf), lnurlInfo: try FfiConverterOptionTypeLnUrlInfo.read(from: &buf), bip353Address: try FfiConverterOptionString.read(from: &buf), payerNote: try FfiConverterOptionString.read(from: &buf)
@@ -9858,7 +9864,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
         switch value {
         
         
-        case let .lightning(swapId,description,liquidExpirationBlockheight,preimage,invoice,bolt12Offer,paymentHash,destinationPubkey,lnurlInfo,bip353Address,payerNote,claimTxId,refundTxId,refundTxAmountSat):
+        case let .lightning(swapId,description,liquidExpirationBlockheight,preimage,invoice,bolt12Offer,paymentHash,destinationPubkey,lnurlInfo,bip353Address,payerNote,claimTxId,refundTxId,refundTxAmountSat,settledAt):
             writeInt(&buf, Int32(1))
             FfiConverterString.write(swapId, into: &buf)
             FfiConverterString.write(description, into: &buf)
@@ -9874,6 +9880,7 @@ public struct FfiConverterTypePaymentDetails: FfiConverterRustBuffer {
             FfiConverterOptionString.write(claimTxId, into: &buf)
             FfiConverterOptionString.write(refundTxId, into: &buf)
             FfiConverterOptionUInt64.write(refundTxAmountSat, into: &buf)
+            FfiConverterOptionUInt32.write(settledAt, into: &buf)
             
         
         case let .liquid(assetId,destination,description,assetInfo,lnurlInfo,bip353Address,payerNote):
